@@ -4,36 +4,33 @@
 package papercut;
 
 import playn.core.PlayN;
-import com.threerings.flashbang.util.Loadable;
-import com.threerings.flashbang.Flashbang;
+import playn.core.ResourceCallback;
+
 import pythagoras.i.Point;
+
+import com.threerings.flashbang.Flashbang;
 import com.threerings.flashbang.FlashbangApp;
 
 public class PapercutApp extends FlashbangApp
 {
-    @Override public void init ()
-    {
+    @Override public void init () {
         super.init();
 
-        // Load resources
-        TestResources.load(new Loadable.Callback() {
-            @Override public void done () {
-                Flashbang.app().defaultViewport().unwindToMode(new AnimateMode());
+        Papercut.listAssets("", new ResourceCallback<Iterable<String>>() {
+            @Override public void done (Iterable<String> assets) {
+                Flashbang.app().defaultViewport().unwindToMode(new AnimateMode(assets));
             }
-            @Override public void error (Throwable err) {
-                PlayN.log().error("Something broke!", err);
+            @Override public void error (Throwable t) {
+                PlayN.log().error("Listing failed!", t);
             }
         });
-
     }
 
-    @Override public int updateRate ()
-    {
+    @Override public int updateRate () {
         return UPDATE_RATE;
     }
 
-    @Override public Point screenSize ()
-    {
+    @Override public Point screenSize () {
         return SCREEN_SIZE;
     }
 

@@ -3,14 +3,17 @@
 
 package papercut.java;
 
-import playn.core.PlayN;
-import playn.java.JavaPlatform;
+import papercut.Papercut;
 import papercut.PapercutApp;
 
-public class Papercut
+import playn.core.PlayN;
+import playn.java.JavaPlatform;
+
+public class PapercutJava
 {
     public static void main (String[] args) {
         JavaPlatform.register().assetManager().setPathPrefix("src/main/resources");
+        Papercut.init(new JavaAssetLister());
         PlayN.run(new PapercutApp());
     }
 }
