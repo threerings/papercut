@@ -30,5 +30,5 @@ public class PapercutApp extends FlashbangApp
         return SCREEN_SIZE;
     }
 
-    protected static final Point SCREEN_SIZE = new Point(640, 960);
+    protected static final Point SCREEN_SIZE = new Point(1024, 768);
 }
