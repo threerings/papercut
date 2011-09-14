@@ -26,14 +26,9 @@ public class PapercutApp extends FlashbangApp
         });
     }
 
-    @Override public int updateRate () {
-        return UPDATE_RATE;
-    }
-
     @Override public Point screenSize () {
         return SCREEN_SIZE;
     }
 
-    protected static final int UPDATE_RATE = 30;
     protected static final Point SCREEN_SIZE = new Point(640, 960);
 }

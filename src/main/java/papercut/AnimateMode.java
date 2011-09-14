@@ -3,6 +3,8 @@
 
 package papercut;
 
+import playn.core.PlayN;
+
 import react.Slot;
 
 import tripleplay.ui.AxisLayout;
@@ -21,7 +23,7 @@ public class AnimateMode extends AppMode
     @Override protected void setup () {
         super.setup();
 
-        _iface = new Interface(input.plistener);
+        _iface = new Interface(pointerListener());
         _root = _iface.createRoot(AxisLayout.vertical().alignLeft());
         _modeLayer.add(_root.layer);
         for (String asset : _assets) {
@@ -35,7 +37,7 @@ public class AnimateMode extends AppMode
             });
         }
         _root.pack();
-        _iface.activate();
+        PlayN.pointer().setListener(_iface.plistener);
     }
 
 
