@@ -29,8 +29,7 @@ object PapercutBuild extends Build {
       javacOptions ++= Seq("-Xlint", "-Xlint:-serial"),
       fork in Compile := true,
 
-      autoScalaLibrary := false, // no scala-library dependency
-      resolvers        += "Forplay Legacy" at "http://forplay.googlecode.com/svn/mavenrepo"
+      autoScalaLibrary := false // no scala-library dependency
     )
   ))
 }
