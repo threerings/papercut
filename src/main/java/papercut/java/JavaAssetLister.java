@@ -30,7 +30,7 @@ public class JavaAssetLister implements AssetLister
             if (sub.isDirectory()) {
                 collectAssets(root, sub, assets);
             } else {
-                assets.add(sub.getAbsolutePath().substring(root.length()));
+                assets.add(sub.getAbsolutePath().substring(root.length() + 1));
             }
         }
     }
