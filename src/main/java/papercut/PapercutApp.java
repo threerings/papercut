@@ -3,6 +3,9 @@
 
 package papercut;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+
 import playn.core.PlayN;
 import playn.core.ResourceCallback;
 
@@ -10,6 +13,9 @@ import pythagoras.i.Point;
 
 import com.threerings.flashbang.Flashbang;
 import com.threerings.flashbang.FlashbangApp;
+import com.threerings.flashbang.rsrc.ImageResource;
+import com.threerings.flashbang.rsrc.ResourceBatch;
+import com.threerings.flashbang.util.Loadable;
 
 public class PapercutApp extends FlashbangApp
 {
@@ -18,7 +24,24 @@ public class PapercutApp extends FlashbangApp
 
         Papercut.listAssets("", new ResourceCallback<Iterable<String>>() {
             @Override public void done (Iterable<String> assets) {
-                Flashbang.app().defaultViewport().unwindToMode(new AnimateMode(assets));
+                final Iterable<String> pngs = Iterables.filter(assets, new Predicate<String> () {
+                    @Override public boolean apply (String asset) {
+                        return asset.endsWith(".png");
+                    }
+                });
+                ResourceBatch images = new ResourceBatch("pngs");
+                for (String png : pngs) {
+                    images.add(new ImageResource(png));
+                }
+                images.load(new Loadable.Callback () {
+                    @Override public void done () {
+                        Flashbang.app().defaultViewport().unwindToMode(new AnimateMode(pngs));
+                    }
+
+                    @Override public void error (Throwable t) {
+                        PlayN.log().error("Loading pngs failed!", t);
+                    }
+                });
             }
             @Override public void error (Throwable t) {
                 PlayN.log().error("Listing failed!", t);
