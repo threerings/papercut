@@ -33,7 +33,7 @@ public class AnimateMode extends AppMode
 
         final Styles styles = Styles.
             make(Style.BACKGROUND.is(Background.solid(0xFFFFFFFF, 2))).
-            makeSelected(
+            addSelected(
                 Style.COLOR.is(0xFFFFFFFF), Style.BACKGROUND.is(Background.solid(0xFF000000, 2)));
 
         _iface = new Interface(pointerListener());
