@@ -4,6 +4,7 @@
 package papercut;
 
 import playn.core.ImageLayer;
+import playn.core.Layer;
 import playn.core.Mouse;
 import playn.core.PlayN;
 
@@ -17,6 +18,8 @@ import tripleplay.ui.Style;
 import tripleplay.ui.Styles;
 
 import com.threerings.flashbang.AppMode;
+import com.threerings.flashbang.anim.rsrc.ImageLayerDesc;
+import com.threerings.flashbang.anim.rsrc.ModelResource;
 import com.threerings.flashbang.rsrc.ImageResource;
 
 public class AnimateMode extends AppMode
@@ -41,7 +44,7 @@ public class AnimateMode extends AppMode
         for (String image : _images) {
             _listing.add(new Button(styles).setText(image));
         }
-        final Selector selector = new Selector(_listing).setSelected(_listing.childAt(0));
+        _selector = new Selector(_listing).setSelected(_listing.childAt(0));
         _listing.packToWidth(200);
 
         PlayN.mouse().setListener(new Mouse.Adapter() {
@@ -54,13 +57,32 @@ public class AnimateMode extends AppMode
                     return;
                 }
                 if (_image == null) {
-                    ImageResource rsrc = ImageResource.require(((Button)selector.selected()).text());
+                    ImageResource rsrc = ImageResource.require(imageName());
                     _image = PlayN.graphics().createImageLayer(rsrc.image());
                     modeLayer.add(_image);
                 }
                 _image.setTranslation(ev.x(), ev.y());
             }
+
+            @Override public void onMouseUp (Mouse.ButtonEvent ev) {
+                if (_image == null) { return; }
+                if (_modelLayer != null) {
+                    modeLayer.remove(_modelLayer);
+                }
+                ImageLayerDesc desc = new ImageLayerDesc();
+                desc.imageName = imageName();
+                desc.x = ev.x() - _listing.size().width();
+                desc.y = ev.y();
+                _model.layers.add(desc);
+                _modelLayer = _model.build();
+                _modelLayer.setTranslation(_listing.size().width(), 0);
+                modeLayer.add(_modelLayer);
+            }
         });
+    }
+
+    protected String imageName () {
+        return ((Button)_selector.selected()).text();
     }
 
     @Override public void update (float dt) {
@@ -71,5 +93,8 @@ public class AnimateMode extends AppMode
     protected Root _listing;
     protected Interface _iface;
     protected ImageLayer _image;
+    protected ModelResource _model = new ModelResource("test");
+    protected Layer _modelLayer;
+    protected Selector _selector;
     protected final Iterable<String> _images;
 }
