@@ -7,12 +7,9 @@ import playn.core.ImageLayer;
 import playn.core.Mouse;
 import playn.core.PlayN;
 
-import react.Slot;
-
 import tripleplay.ui.AxisLayout;
 import tripleplay.ui.Background;
 import tripleplay.ui.Button;
-import tripleplay.ui.Element;
 import tripleplay.ui.Interface;
 import tripleplay.ui.Root;
 import tripleplay.ui.Selector;
@@ -41,24 +38,26 @@ public class AnimateMode extends AppMode
 
         _listing = _iface.createRoot(AxisLayout.vertical().alignLeft().gap(0));
         modeLayer.add(_listing.layer);
-        new Selector(_listing).selected.connect(new Slot<Element<?>>() {
-            @Override public void onEmit (Element<?> b) {
-                if (_image != null) {
-                    _image.destroy();
-                }
-                ImageResource rsrc = ImageResource.require(((Button)b).text());
-                _image = PlayN.graphics().createImageLayer(rsrc.image());
-                modeLayer.add(_image);
-            }
-        });
         for (String image : _images) {
             _listing.add(new Button(styles).setText(image));
         }
+        final Selector selector = new Selector(_listing).setSelected(_listing.childAt(0));
         _listing.packToWidth(200);
 
         PlayN.mouse().setListener(new Mouse.Adapter() {
             @Override public void onMouseMove (Mouse.MotionEvent ev) {
-                if (_image == null) { return; }
+                if (ev.x() <= _listing.size().width()) {
+                    if (_image != null) {
+                        _image.destroy();
+                        _image = null;
+                    }
+                    return;
+                }
+                if (_image == null) {
+                    ImageResource rsrc = ImageResource.require(((Button)selector.selected()).text());
+                    _image = PlayN.graphics().createImageLayer(rsrc.image());
+                    modeLayer.add(_image);
+                }
                 _image.setTranslation(ev.x(), ev.y());
             }
         });
@@ -69,7 +68,7 @@ public class AnimateMode extends AppMode
         _iface.paint(0);
     }
 
-    protected Root _listing, _stage;
+    protected Root _listing;
     protected Interface _iface;
     protected ImageLayer _image;
     protected final Iterable<String> _images;
