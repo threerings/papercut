@@ -11,11 +11,11 @@ import playn.core.ResourceCallback;
 
 import pythagoras.i.Point;
 
-import com.threerings.flashbang.Flashbang;
-import com.threerings.flashbang.FlashbangApp;
-import com.threerings.flashbang.rsrc.ImageResource;
-import com.threerings.flashbang.rsrc.ResourceBatch;
-import com.threerings.flashbang.util.Loadable;
+import flashbang.Flashbang;
+import flashbang.FlashbangApp;
+import flashbang.rsrc.ImageResource;
+import flashbang.rsrc.ResourceBatch;
+import flashbang.util.Loadable;
 
 public class PapercutApp extends FlashbangApp
 {

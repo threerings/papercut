@@ -3,9 +3,9 @@
 
 package papercut;
 
-import com.threerings.flashbang.rsrc.ResourceFile;
-import com.threerings.flashbang.util.Loadable;
-import com.threerings.flashbang.util.LoadableBatch;
+import flashbang.rsrc.ResourceFile;
+import flashbang.util.Loadable;
+import flashbang.util.LoadableBatch;
 
 public class TestResources
 {

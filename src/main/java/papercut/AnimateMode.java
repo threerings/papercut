@@ -17,10 +17,10 @@ import tripleplay.ui.Selector;
 import tripleplay.ui.Style;
 import tripleplay.ui.Styles;
 
-import com.threerings.flashbang.AppMode;
-import com.threerings.flashbang.anim.rsrc.ImageLayerDesc;
-import com.threerings.flashbang.anim.rsrc.ModelResource;
-import com.threerings.flashbang.rsrc.ImageResource;
+import flashbang.AppMode;
+import flashbang.anim.rsrc.ImageLayerDesc;
+import flashbang.anim.rsrc.ModelResource;
+import flashbang.rsrc.ImageResource;
 
 public class AnimateMode extends AppMode
 {
