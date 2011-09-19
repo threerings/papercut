@@ -3,10 +3,18 @@
 
 package papercut;
 
+import flashbang.AppMode;
+import flashbang.anim.rsrc.ImageLayerDesc;
+import flashbang.anim.rsrc.ModelResource;
+import flashbang.rsrc.ImageResource;
+
 import playn.core.ImageLayer;
 import playn.core.Layer;
 import playn.core.Mouse;
 import playn.core.PlayN;
+
+import pythagoras.f.Dimension;
+import pythagoras.f.Rectangle;
 
 import tripleplay.ui.AxisLayout;
 import tripleplay.ui.Background;
@@ -16,11 +24,8 @@ import tripleplay.ui.Root;
 import tripleplay.ui.Selector;
 import tripleplay.ui.Style;
 import tripleplay.ui.Styles;
-
-import flashbang.AppMode;
-import flashbang.anim.rsrc.ImageLayerDesc;
-import flashbang.anim.rsrc.ModelResource;
-import flashbang.rsrc.ImageResource;
+import tripleplay.util.Input;
+import tripleplay.util.MouseInput;
 
 public class AnimateMode extends AppMode
 {
@@ -45,17 +50,24 @@ public class AnimateMode extends AppMode
             _listing.add(new Button(styles).setText(image));
         }
         _selector = new Selector(_listing).setSelected(_listing.childAt(0));
-        _listing.packToWidth(200);
+        _listing.packToWidth(LISTING_WIDTH);
 
-        PlayN.mouse().setListener(new Mouse.Adapter() {
+        PlayN.mouse().setListener(minput.mlistener);
+        Rectangle listingBounds = new Rectangle(new Dimension(LISTING_WIDTH,
+            PapercutApp.SCREEN_SIZE.y()));
+        minput.register(new Input.BoundsRegion(listingBounds), new Mouse.Adapter() {
             @Override public void onMouseMove (Mouse.MotionEvent ev) {
-                if (ev.x() <= _listing.size().width()) {
-                    if (_image != null) {
-                        _image.destroy();
-                        _image = null;
-                    }
-                    return;
+                if (_image != null) {
+                    _image.destroy();
+                    _image = null;
                 }
+            }
+        });
+
+        Rectangle stageBounds = new Rectangle(LISTING_WIDTH, 0,
+            PapercutApp.SCREEN_SIZE.x() - LISTING_WIDTH, PapercutApp.SCREEN_SIZE.y());
+        minput.register(new Input.BoundsRegion(stageBounds), new Mouse.Adapter() {
+            @Override public void onMouseMove (Mouse.MotionEvent ev) {
                 if (_image == null) {
                     ImageResource rsrc = ImageResource.require(imageName());
                     _image = PlayN.graphics().createImageLayer(rsrc.image());
@@ -65,7 +77,6 @@ public class AnimateMode extends AppMode
             }
 
             @Override public void onMouseUp (Mouse.ButtonEvent ev) {
-                if (_image == null) { return; }
                 if (_modelLayer != null) {
                     modeLayer.remove(_modelLayer);
                 }
@@ -96,5 +107,7 @@ public class AnimateMode extends AppMode
     protected ModelResource _model = new ModelResource("test");
     protected Layer _modelLayer;
     protected Selector _selector;
+    protected final MouseInput minput = new MouseInput();
     protected final Iterable<String> _images;
+    protected static final int LISTING_WIDTH = 200;
 }
