@@ -3,11 +3,6 @@
 
 package papercut;
 
-import flashbang.AppMode;
-import flashbang.anim.rsrc.ImageLayerDesc;
-import flashbang.anim.rsrc.ModelResource;
-import flashbang.rsrc.ImageResource;
-
 import playn.core.ImageLayer;
 import playn.core.Layer;
 import playn.core.Mouse;
@@ -27,6 +22,11 @@ import tripleplay.ui.Styles;
 import tripleplay.util.Input;
 import tripleplay.util.MouseInput;
 
+import flashbang.AppMode;
+import flashbang.anim.rsrc.ImageLayerDesc;
+import flashbang.anim.rsrc.ModelResource;
+import flashbang.rsrc.ImageResource;
+
 public class AnimateMode extends AppMode
 {
     public AnimateMode (Iterable<String> images) {
@@ -36,8 +36,7 @@ public class AnimateMode extends AppMode
     @Override protected void setup () {
         super.setup();
 
-        final Styles styles = Styles.
-            make(Style.BACKGROUND.is(Background.solid(0xFFFFFFFF, 2))).
+        final Styles styles = Styles.make(Style.BACKGROUND.is(Background.solid(0xFFFFFFFF, 2))).
             addSelected(
                 Style.COLOR.is(0xFFFFFFFF), Style.BACKGROUND.is(Background.solid(0xFF000000, 2)));
 
@@ -50,7 +49,14 @@ public class AnimateMode extends AppMode
             _listing.add(new Button(styles).setText(image));
         }
         _selector = new Selector(_listing).setSelected(_listing.childAt(0));
-        _listing.packToWidth(LISTING_WIDTH);
+        _listing.setSize(LISTING_WIDTH, LISTING_HEIGHT);
+
+        _tree = _iface.createRoot(AxisLayout.vertical().alignLeft().gap(0));
+        modeLayer.add(_tree.layer);
+        _tree.layer.setTranslation(0, LISTING_HEIGHT);
+        _tree.add(new LayerTree(_model));
+        _tree.setSize(LISTING_WIDTH, PapercutApp.SCREEN_SIZE.y() - LISTING_HEIGHT);
+
 
         PlayN.mouse().setListener(minput.mlistener);
         Rectangle listingBounds = new Rectangle(new Dimension(LISTING_WIDTH,
@@ -81,7 +87,7 @@ public class AnimateMode extends AppMode
                     modeLayer.remove(_modelLayer);
                 }
                 ImageLayerDesc desc = new ImageLayerDesc();
-                desc.imageName = imageName();
+                desc.imageName = desc.name = imageName();
                 desc.x = ev.x() - _listing.size().width();
                 desc.y = ev.y();
                 _model.layers.add(desc);
@@ -101,7 +107,7 @@ public class AnimateMode extends AppMode
         _iface.paint(0);
     }
 
-    protected Root _listing;
+    protected Root _listing, _tree;
     protected Interface _iface;
     protected ImageLayer _image;
     protected ModelResource _model = new ModelResource("test");
@@ -109,5 +115,5 @@ public class AnimateMode extends AppMode
     protected Selector _selector;
     protected final MouseInput minput = new MouseInput();
     protected final Iterable<String> _images;
-    protected static final int LISTING_WIDTH = 200;
+    protected static final int LISTING_WIDTH = 200, LISTING_HEIGHT = 400;
 }
