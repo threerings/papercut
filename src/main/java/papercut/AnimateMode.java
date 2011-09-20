@@ -27,6 +27,8 @@ import flashbang.anim.rsrc.ImageLayerDesc;
 import flashbang.anim.rsrc.ModelResource;
 import flashbang.rsrc.ImageResource;
 
+import static papercut.PapercutApp.SCREEN_SIZE;
+
 public class AnimateMode extends AppMode
 {
     public AnimateMode (Iterable<String> images) {
@@ -55,12 +57,10 @@ public class AnimateMode extends AppMode
         modeLayer.add(_tree.layer);
         _tree.layer.setTranslation(0, LISTING_HEIGHT);
         _tree.add(new LayerTree(_model));
-        _tree.setSize(LISTING_WIDTH, PapercutApp.SCREEN_SIZE.y() - LISTING_HEIGHT);
-
+        _tree.setSize(LISTING_WIDTH, TREE_HEIGHT);
 
         PlayN.mouse().setListener(minput.mlistener);
-        Rectangle listingBounds = new Rectangle(new Dimension(LISTING_WIDTH,
-            PapercutApp.SCREEN_SIZE.y()));
+        Rectangle listingBounds = new Rectangle(new Dimension(LISTING_WIDTH, SCREEN_SIZE.y()));
         minput.register(new Input.BoundsRegion(listingBounds), new Mouse.Adapter() {
             @Override public void onMouseMove (Mouse.MotionEvent ev) {
                 if (_image != null) {
@@ -70,8 +70,7 @@ public class AnimateMode extends AppMode
             }
         });
 
-        Rectangle stageBounds = new Rectangle(LISTING_WIDTH, 0,
-            PapercutApp.SCREEN_SIZE.x() - LISTING_WIDTH, PapercutApp.SCREEN_SIZE.y());
+        Rectangle stageBounds = new Rectangle(LISTING_WIDTH, 0, STAGE_WIDTH, LISTING_HEIGHT);
         minput.register(new Input.BoundsRegion(stageBounds), new Mouse.Adapter() {
             @Override public void onMouseMove (Mouse.MotionEvent ev) {
                 if (_image == null) {
@@ -115,5 +114,8 @@ public class AnimateMode extends AppMode
     protected Selector _selector;
     protected final MouseInput minput = new MouseInput();
     protected final Iterable<String> _images;
+
     protected static final int LISTING_WIDTH = 200, LISTING_HEIGHT = 400;
+    protected static final int TREE_HEIGHT = SCREEN_SIZE.y() - LISTING_HEIGHT;
+    protected static final int STAGE_WIDTH = SCREEN_SIZE.x() - LISTING_WIDTH;
 }
