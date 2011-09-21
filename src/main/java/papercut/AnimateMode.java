@@ -8,8 +8,10 @@ import playn.core.Layer;
 import playn.core.Mouse;
 import playn.core.PlayN;
 
-import pythagoras.f.Dimension;
+import pythagoras.f.IPoint;
 import pythagoras.f.Rectangle;
+
+import react.Slot;
 
 import tripleplay.ui.AxisLayout;
 import tripleplay.ui.Background;
@@ -24,6 +26,8 @@ import tripleplay.util.MouseInput;
 
 import flashbang.AppMode;
 import flashbang.anim.rsrc.ImageLayerDesc;
+import flashbang.anim.rsrc.KeyframeDesc;
+import flashbang.anim.rsrc.ModelAnimDesc;
 import flashbang.anim.rsrc.ModelResource;
 import flashbang.rsrc.ImageResource;
 
@@ -33,6 +37,7 @@ public class AnimateMode extends AppMode
 {
     public AnimateMode (Iterable<String> images) {
         _images = images;
+        _model.anims.put("default", new ModelAnimDesc());
     }
 
     @Override protected void setup () {
@@ -56,22 +61,20 @@ public class AnimateMode extends AppMode
         _tree = _iface.createRoot(AxisLayout.vertical().alignLeft().gap(0));
         modeLayer.add(_tree.layer);
         _tree.layer.setTranslation(0, LISTING_HEIGHT);
-        _tree.add(new LayerTree(_model));
-        _tree.setSize(LISTING_WIDTH, TREE_HEIGHT);
-
-        PlayN.mouse().setListener(minput.mlistener);
-        Rectangle listingBounds = new Rectangle(new Dimension(LISTING_WIDTH, SCREEN_SIZE.y()));
-        minput.register(new Input.BoundsRegion(listingBounds), new Mouse.Adapter() {
-            @Override public void onMouseMove (Mouse.MotionEvent ev) {
-                if (_image != null) {
-                    _image.destroy();
-                    _image = null;
-                }
+        LayerTree lt = new LayerTree(_model, _model.anims.get("default"));
+        _tree.add(lt);
+        lt.frameSelected.connect(new Slot<KeyframeDesc> () {
+            @Override public void onEmit (KeyframeDesc kf) {
+                System.out.println("SELECTED: " + kf);
             }
         });
+        _tree.setSize(SCREEN_SIZE.x(), TREE_HEIGHT);
 
-        Rectangle stageBounds = new Rectangle(LISTING_WIDTH, 0, STAGE_WIDTH, LISTING_HEIGHT);
-        minput.register(new Input.BoundsRegion(stageBounds), new Mouse.Adapter() {
+        PlayN.mouse().setListener(_minput.mlistener);
+
+        Input.Region stageRegion =
+            new Input.BoundsRegion(new Rectangle(LISTING_WIDTH, 0, STAGE_WIDTH, LISTING_HEIGHT));
+        _minput.register(stageRegion, new Mouse.Adapter() {
             @Override public void onMouseMove (Mouse.MotionEvent ev) {
                 if (_image == null) {
                     ImageResource rsrc = ImageResource.require(imageName());
@@ -95,6 +98,15 @@ public class AnimateMode extends AppMode
                 modeLayer.add(_modelLayer);
             }
         });
+
+        _minput.register(new NotRegion(stageRegion), new Mouse.Adapter() {
+            @Override public void onMouseMove (Mouse.MotionEvent ev) {
+                if (_image != null) {
+                    _image.destroy();
+                    _image = null;
+                }
+            }
+        });
     }
 
     protected String imageName () {
@@ -106,13 +118,25 @@ public class AnimateMode extends AppMode
         _iface.paint(0);
     }
 
+    public static class NotRegion extends Input.Region {
+        public NotRegion (Input.Region region) {
+            _region = region;
+        }
+
+        @Override public boolean hitTest (IPoint p) {
+            return !_region.hitTest(p);
+        }
+
+        protected final Input.Region _region;
+    }
+
     protected Root _listing, _tree;
     protected Interface _iface;
     protected ImageLayer _image;
     protected ModelResource _model = new ModelResource("test");
     protected Layer _modelLayer;
     protected Selector _selector;
-    protected final MouseInput minput = new MouseInput();
+    protected final MouseInput _minput = new MouseInput();
     protected final Iterable<String> _images;
 
     protected static final int LISTING_WIDTH = 200, LISTING_HEIGHT = 400;
