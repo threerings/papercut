@@ -22,7 +22,7 @@ public class LayerTree extends Elements<LayerTree>
     public final Signal<KeyframeDesc> frameSelected = Signal.create();
 
     public LayerTree (ModelResource resource, ModelAnimDesc animation) {
-        super(AxisLayout.vertical().alignLeft());
+        super(AxisLayout.vertical());
         _resource = resource;
         _anim = animation;
 
@@ -38,11 +38,13 @@ public class LayerTree extends Elements<LayerTree>
     }
 
     protected void addLayer (LayerDesc layer) {
-        Group container = new Group(AxisLayout.horizontal().alignOn(AxisLayout.Align.START));
         LayerAnimDesc anim = new LayerAnimDesc();
+        anim.layerSelector = layer.name;
+        anim.keyframes.add(new KeyframeDesc());
+
         _anim.layerAnims.add(anim);
-        container.add(new Label(layer.name), new KeyframeDisplay(anim, frameSelected));
-        add(container);
+        add(new Group(AxisLayout.horizontal()).
+            add(new Label(layer.name), new KeyframeDisplay(anim, frameSelected)));
     }
 
     protected final ModelAnimDesc _anim;

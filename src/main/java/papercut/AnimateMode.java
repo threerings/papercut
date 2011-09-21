@@ -21,10 +21,12 @@ import tripleplay.ui.Root;
 import tripleplay.ui.Selector;
 import tripleplay.ui.Style;
 import tripleplay.ui.Styles;
+import tripleplay.ui.Stylesheet;
 import tripleplay.util.Input;
 import tripleplay.util.MouseInput;
 
 import flashbang.AppMode;
+import flashbang.anim.Model;
 import flashbang.anim.rsrc.ImageLayerDesc;
 import flashbang.anim.rsrc.KeyframeDesc;
 import flashbang.anim.rsrc.ModelAnimDesc;
@@ -43,17 +45,20 @@ public class AnimateMode extends AppMode
     @Override protected void setup () {
         super.setup();
 
-        final Styles styles = Styles.make(Style.BACKGROUND.is(Background.solid(0xFFFFFFFF, 2))).
-            addSelected(
-                Style.COLOR.is(0xFFFFFFFF), Style.BACKGROUND.is(Background.solid(0xFF000000, 2)));
-
         _iface = new Interface(pointerListener());
         PlayN.pointer().setListener(_iface.plistener);
 
-        _listing = _iface.createRoot(AxisLayout.vertical().alignLeft().gap(0));
+        Styles buttonStyles = Styles.none().
+            add(
+                Style.HALIGN.is(Style.HAlign.LEFT),
+                Style.BACKGROUND.is(Background.solid(0xFFFFFFFF, 2))).
+            addSelected(
+                Style.COLOR.is(0xFFFFFFFF), Style.BACKGROUND.is(Background.solid(0xFF000000, 2)));
+        _listing = _iface.createRoot(AxisLayout.vertical().gap(0),
+            Stylesheet.builder().add(Button.class, buttonStyles).create());
         modeLayer.add(_listing.layer);
         for (String image : _images) {
-            _listing.add(new Button(styles).setText(image));
+            _listing.add(new Button().setText(image));
         }
         _selector = new Selector(_listing).setSelected(_listing.childAt(0));
         _listing.setSize(LISTING_WIDTH, LISTING_HEIGHT);
@@ -65,7 +70,7 @@ public class AnimateMode extends AppMode
         _editor.add(editor);
         _editor.setSize(LISTING_WIDTH, LISTING_HEIGHT);
 
-        _tree = _iface.createRoot(AxisLayout.vertical().alignLeft().gap(0));
+        _tree = _iface.createRoot(AxisLayout.vertical().gap(0));
         modeLayer.add(_tree.layer);
         _tree.layer.setTranslation(0, LISTING_HEIGHT);
         LayerTree lt = new LayerTree(_model, _model.anims.get("default"));
@@ -92,18 +97,20 @@ public class AnimateMode extends AppMode
             }
 
             @Override public void onMouseUp (Mouse.ButtonEvent ev) {
-                if (_modelLayer != null) {
-                    modeLayer.remove(_modelLayer);
+                if (_displayed != null) {
+                    modeLayer.remove(_displayed.layer());
                 }
                 ImageLayerDesc desc = new ImageLayerDesc();
                 desc.imageName = desc.name = imageName();
                 desc.x = ev.x() - _listing.size().width();
                 desc.y = ev.y();
                 _model.layers.add(desc);
-                _modelLayer = _model.build();
-                _modelLayer.setTranslation(_listing.size().width(), 0);
-                modeLayer.add(_modelLayer);
+                _displayed = new Model(_model);
+                _displayed.layer().setTranslation(_listing.size().width(), 0);
+                modeLayer.add(_displayed.layer());
             }
+
+            protected Model _displayed;
         });
 
         _minput.register(new NotRegion(stageRegion), new Mouse.Adapter() {
@@ -141,7 +148,6 @@ public class AnimateMode extends AppMode
     protected Interface _iface;
     protected ImageLayer _image;
     protected ModelResource _model = new ModelResource("test");
-    protected Layer _modelLayer;
     protected Selector _selector;
     protected final MouseInput _minput = new MouseInput();
     protected final Iterable<String> _images;
