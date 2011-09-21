@@ -77,8 +77,6 @@ public class AnimateMode extends AppMode
         });
         _tree.setSize(SCREEN_SIZE.x(), TREE_HEIGHT);
 
-
-
         PlayN.mouse().setListener(_minput.mlistener);
 
         Input.Region stageRegion =
