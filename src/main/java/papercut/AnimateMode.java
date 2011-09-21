@@ -3,15 +3,15 @@
 
 package papercut;
 
-import playn.core.ImageLayer;
-import playn.core.Layer;
-import playn.core.Mouse;
-import playn.core.PlayN;
-
 import pythagoras.f.IPoint;
 import pythagoras.f.Rectangle;
 
 import react.Slot;
+
+import playn.core.ImageLayer;
+import playn.core.Layer;
+import playn.core.Mouse;
+import playn.core.PlayN;
 
 import tripleplay.ui.AxisLayout;
 import tripleplay.ui.Background;
@@ -58,6 +58,13 @@ public class AnimateMode extends AppMode
         _selector = new Selector(_listing).setSelected(_listing.childAt(0));
         _listing.setSize(LISTING_WIDTH, LISTING_HEIGHT);
 
+        _editor = _iface.createRoot(AxisLayout.horizontal());
+        modeLayer.add(_editor.layer);
+        _editor.layer.setTranslation(LISTING_WIDTH + STAGE_WIDTH, 0);
+        final KeyframeEditor editor = new KeyframeEditor();
+        _editor.add(editor);
+        _editor.setSize(LISTING_WIDTH, LISTING_HEIGHT);
+
         _tree = _iface.createRoot(AxisLayout.vertical().alignLeft().gap(0));
         modeLayer.add(_tree.layer);
         _tree.layer.setTranslation(0, LISTING_HEIGHT);
@@ -65,10 +72,12 @@ public class AnimateMode extends AppMode
         _tree.add(lt);
         lt.frameSelected.connect(new Slot<KeyframeDesc> () {
             @Override public void onEmit (KeyframeDesc kf) {
-                System.out.println("SELECTED: " + kf);
+                editor.setKeyframe(kf);
             }
         });
         _tree.setSize(SCREEN_SIZE.x(), TREE_HEIGHT);
+
+
 
         PlayN.mouse().setListener(_minput.mlistener);
 
@@ -130,7 +139,7 @@ public class AnimateMode extends AppMode
         protected final Input.Region _region;
     }
 
-    protected Root _listing, _tree;
+    protected Root _listing, _tree, _editor;
     protected Interface _iface;
     protected ImageLayer _image;
     protected ModelResource _model = new ModelResource("test");
@@ -141,5 +150,5 @@ public class AnimateMode extends AppMode
 
     protected static final int LISTING_WIDTH = 200, LISTING_HEIGHT = 400;
     protected static final int TREE_HEIGHT = SCREEN_SIZE.y() - LISTING_HEIGHT;
-    protected static final int STAGE_WIDTH = SCREEN_SIZE.x() - LISTING_WIDTH;
+    protected static final int STAGE_WIDTH = SCREEN_SIZE.x() - LISTING_WIDTH * 2;
 }
