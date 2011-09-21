@@ -11,16 +11,12 @@
   <description>
   </description>
   <url>http://github.com/threerings/papercut</url>
-  
-  <properties>
-    <playn.version>1.0-SNAPSHOT</playn.version>
-  </properties>
 
   <dependencies>
     <dependency>
       <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-java</artifactId>
-      <version>${playn.version}</version>
+      <version>1.0-SNAPSHOT</version>
     </dependency>
     
     <dependency>
