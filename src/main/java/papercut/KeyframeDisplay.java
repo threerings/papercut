@@ -3,14 +3,14 @@
 
 package papercut;
 
-import playn.core.CanvasLayer;
-import playn.core.PlayN;
-
 import pythagoras.f.FloatMath;
 import pythagoras.f.IDimension;
 
 import react.Signal;
 import react.Slot;
+
+import playn.core.CanvasLayer;
+import playn.core.PlayN;
 
 import tripleplay.ui.AxisLayout;
 import tripleplay.ui.Background;
@@ -19,12 +19,12 @@ import tripleplay.ui.Elements;
 import tripleplay.ui.Style;
 import tripleplay.ui.Styles;
 
-import flashbang.anim.rsrc.KeyframeDesc;
-import flashbang.anim.rsrc.LayerAnimDesc;
+import flashbang.anim.rsrc.EditableLayerAnimation;
 
 public class KeyframeDisplay extends Elements<KeyframeDisplay>
 {
-    public KeyframeDisplay (LayerAnimDesc anim, final Signal<KeyframeDesc> frameSelected) {
+    public KeyframeDisplay (EditableLayerAnimation anim,
+        final Signal<Integer> frameSelected) {
         super(AxisLayout.horizontal().gap(0));
         _anim = anim;
 
@@ -36,14 +36,7 @@ public class KeyframeDisplay extends Elements<KeyframeDisplay>
             add(frame);
             frame.clicked().connect(new Slot<Button> () {
                 @Override public void onEmit (Button b) {
-                    for (KeyframeDesc kf : _anim.keyframes) {
-                        if (kf.frameIdx == frameIdx) {
-                            frameSelected.emit(kf);
-                            return;
-                        }
-                    }
-                    _anim.keyframes.add(new KeyframeDesc(frameIdx));
-                    frameSelected.emit(_anim.keyframes.get(_anim.keyframes.size() - 1));
+                    frameSelected.emit(frameIdx);
                 }
             });
         }
@@ -65,5 +58,5 @@ public class KeyframeDisplay extends Elements<KeyframeDisplay>
         }
     }
 
-    protected final LayerAnimDesc _anim;
+    protected final EditableLayerAnimation _anim;
 }

@@ -11,23 +11,25 @@ import tripleplay.ui.Elements;
 import tripleplay.ui.Group;
 import tripleplay.ui.Label;
 
-import flashbang.anim.rsrc.KeyframeDesc;
-import flashbang.anim.rsrc.LayerAnimDesc;
+import flashbang.anim.rsrc.EditableLayerAnimation;
+import flashbang.anim.rsrc.EditableModelAnimation;
+import flashbang.anim.rsrc.EditableModelResource;
+import flashbang.anim.rsrc.Keyframe;
 import flashbang.anim.rsrc.LayerDesc;
-import flashbang.anim.rsrc.ModelAnimDesc;
+import flashbang.anim.rsrc.ModelAnimation;
 import flashbang.anim.rsrc.ModelResource;
 
 public class LayerTree extends Elements<LayerTree>
 {
-    public final Signal<KeyframeDesc> frameSelected = Signal.create();
+    public final Signal<Integer> frameSelected = Signal.create();
 
-    public LayerTree (ModelResource resource, ModelAnimDesc animation) {
+    public LayerTree (EditableModelResource resource, EditableModelAnimation animation) {
         super(AxisLayout.vertical());
         _resource = resource;
         _anim = animation;
 
-        for (LayerDesc layer : resource.layers) {
-            // TODO - check for an existing LayerAnimDesc
+        for (LayerDesc layer : resource.layers()) {
+            // TODO - check for an existing LayerAnimation
             addLayer(layer);
         }
         resource.layers.listen(new RList.Listener<LayerDesc> () {
@@ -38,15 +40,14 @@ public class LayerTree extends Elements<LayerTree>
     }
 
     protected void addLayer (LayerDesc layer) {
-        LayerAnimDesc anim = new LayerAnimDesc();
-        anim.layerSelector = layer.name;
-        anim.keyframes.add(new KeyframeDesc());
+        // TODO - layer nesting
+        EditableLayerAnimation anim = new EditableLayerAnimation(layer.name);
 
-        _anim.layerAnims.add(anim);
+        _anim.layers.add(anim);
         add(new Group(AxisLayout.horizontal()).
             add(new Label(layer.name), new KeyframeDisplay(anim, frameSelected)));
     }
 
-    protected final ModelAnimDesc _anim;
+    protected final EditableModelAnimation _anim;
     protected final ModelResource _resource;
 }

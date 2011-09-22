@@ -27,9 +27,12 @@ import tripleplay.util.MouseInput;
 
 import flashbang.AppMode;
 import flashbang.anim.Model;
+import flashbang.anim.rsrc.EditableLayerAnimation;
+import flashbang.anim.rsrc.EditableModelAnimation;
+import flashbang.anim.rsrc.EditableModelResource;
 import flashbang.anim.rsrc.ImageLayerDesc;
-import flashbang.anim.rsrc.KeyframeDesc;
-import flashbang.anim.rsrc.ModelAnimDesc;
+import flashbang.anim.rsrc.Keyframe;
+import flashbang.anim.rsrc.KeyframeType;
 import flashbang.anim.rsrc.ModelResource;
 import flashbang.rsrc.ImageResource;
 
@@ -39,7 +42,7 @@ public class AnimateMode extends AppMode
 {
     public AnimateMode (Iterable<String> images) {
         _images = images;
-        _model.anims.put("default", new ModelAnimDesc());
+        _model.animations.put("default", new EditableModelAnimation());
     }
 
     @Override protected void setup () {
@@ -73,11 +76,11 @@ public class AnimateMode extends AppMode
         _tree = _iface.createRoot(AxisLayout.vertical().gap(0));
         modeLayer.add(_tree.layer);
         _tree.layer.setTranslation(0, LISTING_HEIGHT);
-        LayerTree lt = new LayerTree(_model, _model.anims.get("default"));
+        LayerTree lt = new LayerTree(_model, _model.animations.get("default"));
         _tree.add(lt);
-        lt.frameSelected.connect(new Slot<KeyframeDesc> () {
-            @Override public void onEmit (KeyframeDesc kf) {
-                editor.setKeyframe(kf);
+        lt.frameSelected.connect(new Slot<Integer> () {
+            @Override public void onEmit (Integer frame) {
+                editor.setFrame(frame);
             }
         });
         _tree.setSize(SCREEN_SIZE.x(), TREE_HEIGHT);
@@ -98,16 +101,23 @@ public class AnimateMode extends AppMode
 
             @Override public void onMouseUp (Mouse.ButtonEvent ev) {
                 if (_displayed != null) {
-                    modeLayer.remove(_displayed.layer());
+                    _displayed.destroySelf();
                 }
                 ImageLayerDesc desc = new ImageLayerDesc();
                 desc.imageName = desc.name = imageName();
-                desc.x = ev.x() - _listing.size().width();
-                desc.y = ev.y();
                 _model.layers.add(desc);
+                EditableModelAnimation anim = _model.animations.get("default");
+                EditableLayerAnimation layerAnim = new EditableLayerAnimation(desc.imageName);
+                anim.layers.add(layerAnim);
+                layerAnim.keyframes.get(KeyframeType.X_LOCATION).value.update(
+                    ev.x() - _listing.size().width());
+                layerAnim.keyframes.get(KeyframeType.Y_LOCATION).value.update(ev.y());
+                editor._layer = layerAnim;
+
                 _displayed = new Model(_model);
                 _displayed.layer().setTranslation(_listing.size().width(), 0);
-                modeLayer.add(_displayed.layer());
+                _displayed.playAnimation("default");
+                addObject(_displayed, modeLayer);
             }
 
             protected Model _displayed;
@@ -147,7 +157,7 @@ public class AnimateMode extends AppMode
     protected Root _listing, _tree, _editor;
     protected Interface _iface;
     protected ImageLayer _image;
-    protected ModelResource _model = new ModelResource("test");
+    protected EditableModelResource _model = new EditableModelResource();
     protected Selector _selector;
     protected final MouseInput _minput = new MouseInput();
     protected final Iterable<String> _images;

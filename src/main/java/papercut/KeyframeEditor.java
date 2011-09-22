@@ -15,7 +15,8 @@ import tripleplay.ui.Group;
 import tripleplay.ui.Label;
 import tripleplay.ui.Slider;
 
-import flashbang.anim.rsrc.KeyframeDesc;
+import flashbang.anim.rsrc.EditableLayerAnimation;
+import flashbang.anim.rsrc.KeyframeType;
 
 public class KeyframeEditor extends Elements<KeyframeEditor>
 {
@@ -24,7 +25,7 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
         addSlider(_rotation, "Rotation");
         _rotation.value.connect(new Slot<Float> () {
             @Override public void onEmit (Float val) {
-                _desc.rotation = val;
+                _layer.add(KeyframeType.ROTATION, _frame, (float)Math.toRadians(val));
             }
         });
     }
@@ -38,12 +39,12 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
         slider.value.updateForce(slider.value.get());
     }
 
-    public void setKeyframe (KeyframeDesc desc) {
-        _desc = desc;
-        _rotation.value.update(desc.rotation);
+    public void setFrame (int frame ) {
+        _frame = frame;
     }
 
-    protected KeyframeDesc _desc;
+    protected int _frame;
+    protected EditableLayerAnimation _layer;
 
     protected final Slider _rotation = new Slider(0, -180, 180);
 
