@@ -3,15 +3,16 @@
 
 package papercut;
 
-import pythagoras.f.IPoint;
-import pythagoras.f.Rectangle;
-
-import react.Slot;
-
 import playn.core.ImageLayer;
 import playn.core.Layer;
 import playn.core.Mouse;
 import playn.core.PlayN;
+
+import pythagoras.f.IPoint;
+import pythagoras.f.Rectangle;
+
+import react.Slot;
+import react.UnitSlot;
 
 import tripleplay.ui.AxisLayout;
 import tripleplay.ui.Background;
@@ -63,7 +64,7 @@ public class AnimateMode extends AppMode
         for (String image : _images) {
             _listing.add(new Button().setText(image));
         }
-        _selector = new Selector(_listing).setSelected(_listing.childAt(0));
+        _selector = new Selector().add(_listing).setSelected(_listing.childAt(0));
         _listing.setSize(LISTING_WIDTH, LISTING_HEIGHT);
 
         _editor = _iface.createRoot(AxisLayout.horizontal());
@@ -76,11 +77,11 @@ public class AnimateMode extends AppMode
         _tree = _iface.createRoot(AxisLayout.vertical().gap(0));
         modeLayer.add(_tree.layer);
         _tree.layer.setTranslation(0, LISTING_HEIGHT);
-        LayerTree lt = new LayerTree(_model, _model.animations.get("default"));
+        final LayerTree lt = new LayerTree(_model.animations.get("default"));
         _tree.add(lt);
-        lt.frameSelected.connect(new Slot<Integer> () {
-            @Override public void onEmit (Integer frame) {
-                editor.setFrame(frame);
+        lt.frameSelected.connect(new UnitSlot () {
+            @Override public void onEmit () {
+                editor.setFrame(lt.layer(), lt.frame());
             }
         });
         _tree.setSize(SCREEN_SIZE.x(), TREE_HEIGHT);
@@ -106,13 +107,12 @@ public class AnimateMode extends AppMode
                 ImageLayerDesc desc = new ImageLayerDesc();
                 desc.imageName = desc.name = imageName();
                 _model.layers.add(desc);
-                EditableModelAnimation anim = _model.animations.get("default");
+
                 EditableLayerAnimation layerAnim = new EditableLayerAnimation(desc.imageName);
-                anim.layers.add(layerAnim);
                 layerAnim.keyframes.get(KeyframeType.X_LOCATION).value.update(
                     ev.x() - _listing.size().width());
                 layerAnim.keyframes.get(KeyframeType.Y_LOCATION).value.update(ev.y());
-                editor._layer = layerAnim;
+                _model.animations.get("default").layers.add(layerAnim);
 
                 _displayed = new Model(_model);
                 _displayed.layer().setTranslation(_listing.size().width(), 0);
@@ -134,7 +134,7 @@ public class AnimateMode extends AppMode
     }
 
     protected String imageName () {
-        return ((Button)_selector.selected()).text();
+        return ((Button)_selector.selected().get()).text();
     }
 
     @Override public void update (float dt) {

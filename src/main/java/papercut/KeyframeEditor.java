@@ -39,8 +39,9 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
         slider.value.updateForce(slider.value.get());
     }
 
-    public void setFrame (int frame ) {
+    public void setFrame (EditableLayerAnimation layer, int frame) {
         _frame = frame;
+        _layer = layer;
     }
 
     protected int _frame;
