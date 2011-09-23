@@ -40,7 +40,7 @@ public class LayerTree extends Elements<LayerTree>
         for (EditableLayerAnimation layer : _anim.layers()) {
             _layerAddListener.onAdd(layer);
         }
-        animation.layers.listen(_layerAddListener);
+        animation.layers.connect(_layerAddListener);
         _selector.selected().connect(new UnitSlot () {
             @Override public void onEmit () {
                 frameSelected.emit();
