@@ -23,6 +23,7 @@ import tripleplay.ui.Label;
 import tripleplay.ui.Selector;
 import tripleplay.ui.Stylesheet;
 import tripleplay.ui.TableLayout;
+import tripleplay.ui.TableLayout.Column;
 
 import flashbang.anim.rsrc.EditableLayerAnimation;
 import flashbang.anim.rsrc.EditableModelAnimation;
@@ -36,7 +37,7 @@ public class LayerTree extends Elements<LayerTree>
     public final UnitSignal frameSelected = new UnitSignal();
 
     public LayerTree (EditableModelAnimation animation) {
-        super(createLayout());
+        super(new TableLayout(new Column().alignRight().fixed(), new Column().fixed()).gaps(0, 5));
         setStylesheet(CELL);
 
         _anim = animation;
@@ -50,13 +51,6 @@ public class LayerTree extends Elements<LayerTree>
                 frameSelected.emit();
             }
         });
-    }
-
-    protected static TableLayout createLayout () {
-        TableLayout layout = new TableLayout(2).gaps(0, 5);
-        layout.column(0).alignRight().fixed();
-        layout.column(1).fixed();
-        return layout;
     }
 
     public int frame () { return ((Cell)_selector.selected().get()).frame; }
