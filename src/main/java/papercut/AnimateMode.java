@@ -3,18 +3,17 @@
 
 package papercut;
 
-import pythagoras.f.Rectangle;
-import pythagoras.f.IPoint;
-import pythagoras.f.Rectangle;
-
-import react.Slot;
-import react.UnitSlot;
-
 import playn.core.Font;
 import playn.core.ImageLayer;
 import playn.core.Layer;
 import playn.core.Mouse;
 import playn.core.PlayN;
+
+import pythagoras.f.IPoint;
+import pythagoras.f.Rectangle;
+
+import react.Slot;
+import react.UnitSlot;
 
 import tripleplay.ui.AxisLayout;
 import tripleplay.ui.Background;
@@ -64,6 +63,7 @@ public class AnimateMode extends AppMode
         _selector = new Selector().add(_listing).setSelected(_listing.childAt(0));
 
         _editor = _iface.createRoot(AxisLayout.horizontal(), ROOT, modeLayer).
+            setStyles(make(VALIGN.top)).
             setBounds(LISTING_WIDTH + STAGE_WIDTH, 0, LISTING_WIDTH, LISTING_HEIGHT);
         final KeyframeEditor editor = new KeyframeEditor();
         _editor.add(editor);
