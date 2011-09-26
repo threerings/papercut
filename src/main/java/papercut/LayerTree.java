@@ -3,9 +3,6 @@
 
 package papercut;
 
-import playn.core.CanvasLayer;
-import playn.core.PlayN;
-
 import pythagoras.f.FloatMath;
 import pythagoras.f.IDimension;
 
@@ -14,6 +11,9 @@ import react.Signal;
 import react.UnitSignal;
 import react.UnitSlot;
 
+import playn.core.CanvasLayer;
+import playn.core.PlayN;
+
 import tripleplay.ui.AxisLayout;
 import tripleplay.ui.Background;
 import tripleplay.ui.Button;
@@ -21,20 +21,24 @@ import tripleplay.ui.Elements;
 import tripleplay.ui.Group;
 import tripleplay.ui.Label;
 import tripleplay.ui.Selector;
-import tripleplay.ui.Style;
-import tripleplay.ui.Styles;
 import tripleplay.ui.Stylesheet;
+import tripleplay.ui.TableLayout;
 
 import flashbang.anim.rsrc.EditableLayerAnimation;
 import flashbang.anim.rsrc.EditableModelAnimation;
 import flashbang.anim.rsrc.ModelAnimation;
+
+import static tripleplay.ui.Style.*;
+import static tripleplay.ui.Styles.make;
 
 public class LayerTree extends Elements<LayerTree>
 {
     public final UnitSignal frameSelected = new UnitSignal();
 
     public LayerTree (EditableModelAnimation animation) {
-        super(AxisLayout.vertical());
+        super(createLayout());
+        setStylesheet(CELL);
+
         _anim = animation;
 
         for (EditableLayerAnimation layer : _anim.layers()) {
@@ -48,23 +52,38 @@ public class LayerTree extends Elements<LayerTree>
         });
     }
 
+    protected static TableLayout createLayout () {
+        TableLayout layout = new TableLayout(2).gaps(0, 5);
+        layout.column(0).alignRight().fixed();
+        layout.column(1).fixed();
+        return layout;
+    }
+
     public int frame () { return ((Cell)_selector.selected().get()).frame; }
 
     public EditableLayerAnimation layer () { return ((Cell)_selector.selected().get()).layer; }
 
     protected final RList.Listener<EditableLayerAnimation> _layerAddListener =
         new RList.Listener<EditableLayerAnimation>() {
-        @Override public void onAdd (EditableLayerAnimation anim) {
+        @Override public void onAdd (final EditableLayerAnimation anim) {
             // TODO - layer nesting
-            Group keyframes = new Group(AxisLayout.horizontal().gap(0)).setStylesheet(CELL);
-            for (int ii = 0; ii < 50; ii++) {
-                keyframes.add(new Cell(anim, ii));
-            }
+            Group keyframes = new Group(AxisLayout.horizontal().gap(0)) {
+                @Override protected LayoutData computeLayout (float hintX, float hintY) {
+                    LayoutData ld = super.computeLayout(hintX, hintY);
+                    while (childCount() * FRAME_WIDTH > hintX) {
+                        removeAt(childCount() - 1);
+                    }
+                    while ((childCount() + 1) * FRAME_WIDTH < hintX) {
+                        add(new Cell(anim, childCount() - 1));
+                    }
+                    if (childCount() > 0 && _selector.selected().get() == null) {
+                        _selector.setSelected(childAt(0));
+                    }
+                    return ld;
+                }
+            };
             _selector.add(keyframes);
-            add(new Group(AxisLayout.horizontal()).add(new Label(anim.layerSelector()), keyframes));
-            if (childCount() == 1) {
-                _selector.setSelected(keyframes.childAt(0));
-            }
+            add(new Label(anim.layerSelector()), keyframes);
         }
     };
 
@@ -83,7 +102,7 @@ public class LayerTree extends Elements<LayerTree>
 
     protected static class LinedBackground extends Background {
         public LinedBackground () {
-            super(7, 4, 7, 4);
+            super(FRAME_HEIGHT, FRAME_WIDTH, 0, 0);
         }
 
         @Override protected Instance instantiate (IDimension size) {
@@ -97,7 +116,13 @@ public class LayerTree extends Elements<LayerTree>
         }
     }
 
+    protected static final int FRAME_HEIGHT = 14;
+    protected static final int FRAME_WIDTH = 8;
+
     protected static final Stylesheet CELL = Stylesheet.builder().add(Cell.class,
-        Styles.make(Style.BACKGROUND.is(new LinedBackground())).
-            addSelected(Style.BACKGROUND.is(Background.solid(0xFFFF0000, 7, 4, 7, 4)))).create();
+        make(BACKGROUND.is(new LinedBackground())).
+        addSelected(BACKGROUND.is(Background.solid(0xFFFF0000, FRAME_HEIGHT, FRAME_WIDTH, 0, 0)))).
+        create();
+
+
 }

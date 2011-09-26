@@ -3,25 +3,26 @@
 
 package papercut;
 
-import playn.core.ImageLayer;
-import playn.core.Layer;
-import playn.core.Mouse;
-import playn.core.PlayN;
-
+import pythagoras.f.Rectangle;
 import pythagoras.f.IPoint;
 import pythagoras.f.Rectangle;
 
 import react.Slot;
 import react.UnitSlot;
 
+import playn.core.Font;
+import playn.core.ImageLayer;
+import playn.core.Layer;
+import playn.core.Mouse;
+import playn.core.PlayN;
+
 import tripleplay.ui.AxisLayout;
 import tripleplay.ui.Background;
 import tripleplay.ui.Button;
+import tripleplay.ui.Element;
 import tripleplay.ui.Interface;
 import tripleplay.ui.Root;
 import tripleplay.ui.Selector;
-import tripleplay.ui.Style;
-import tripleplay.ui.Styles;
 import tripleplay.ui.Stylesheet;
 import tripleplay.util.Input;
 import tripleplay.util.MouseInput;
@@ -39,6 +40,9 @@ import flashbang.rsrc.ImageResource;
 
 import static papercut.PapercutApp.SCREEN_SIZE;
 
+import static tripleplay.ui.Style.*;
+import static tripleplay.ui.Styles.make;
+
 public class AnimateMode extends AppMode
 {
     public AnimateMode (Iterable<String> images) {
@@ -52,31 +56,20 @@ public class AnimateMode extends AppMode
         _iface = new Interface(pointerListener());
         PlayN.pointer().setListener(_iface.plistener);
 
-        Styles buttonStyles = Styles.none().
-            add(
-                Style.HALIGN.is(Style.HAlign.LEFT),
-                Style.BACKGROUND.is(Background.solid(0xFFFFFFFF, 2))).
-            addSelected(
-                Style.COLOR.is(0xFFFFFFFF), Style.BACKGROUND.is(Background.solid(0xFF000000, 2)));
-        _listing = _iface.createRoot(AxisLayout.vertical().gap(0),
-            Stylesheet.builder().add(Button.class, buttonStyles).create());
-        modeLayer.add(_listing.layer);
+        _listing = _iface.createRoot(AxisLayout.vertical().gap(0), ROOT, modeLayer).
+            setStyles(make(HALIGN.left, VALIGN.top)).setSize(LISTING_WIDTH, LISTING_HEIGHT);
         for (String image : _images) {
             _listing.add(new Button().setText(image));
         }
         _selector = new Selector().add(_listing).setSelected(_listing.childAt(0));
-        _listing.setSize(LISTING_WIDTH, LISTING_HEIGHT);
 
-        _editor = _iface.createRoot(AxisLayout.horizontal());
-        modeLayer.add(_editor.layer);
-        _editor.layer.setTranslation(LISTING_WIDTH + STAGE_WIDTH, 0);
+        _editor = _iface.createRoot(AxisLayout.horizontal(), ROOT, modeLayer).
+            setBounds(LISTING_WIDTH + STAGE_WIDTH, 0, LISTING_WIDTH, LISTING_HEIGHT);
         final KeyframeEditor editor = new KeyframeEditor();
         _editor.add(editor);
-        _editor.setSize(LISTING_WIDTH, LISTING_HEIGHT);
 
-        _tree = _iface.createRoot(AxisLayout.vertical().gap(0));
-        modeLayer.add(_tree.layer);
-        _tree.layer.setTranslation(0, LISTING_HEIGHT);
+        _tree = _iface.createRoot(AxisLayout.vertical().gap(0), ROOT, modeLayer).
+            setStyles(make(VALIGN.top)).setBounds(0, LISTING_HEIGHT, SCREEN_SIZE.x(), TREE_HEIGHT);
         final LayerTree lt = new LayerTree(_model.animations.get("default"));
         _tree.add(lt);
         lt.frameSelected.connect(new UnitSlot () {
@@ -84,7 +77,6 @@ public class AnimateMode extends AppMode
                 editor.setFrame(lt.layer(), lt.frame());
             }
         });
-        _tree.setSize(SCREEN_SIZE.x(), TREE_HEIGHT);
 
         PlayN.mouse().setListener(_minput.mlistener);
 
@@ -161,6 +153,16 @@ public class AnimateMode extends AppMode
     protected Selector _selector;
     protected final MouseInput _minput = new MouseInput();
     protected final Iterable<String> _images;
+
+    protected static final Font SMALL =
+        PlayN.graphics().createFont("Helvetica", Font.Style.PLAIN, 12);
+
+    protected static final Stylesheet ROOT = Stylesheet.builder().
+        add(Element.class, make(FONT.is(SMALL))).
+        add(Button.class,
+            make(BACKGROUND.is(Background.solid(0xFFFFFFFF, 2))).
+            addSelected(COLOR.is(0xFFFFFFFF), BACKGROUND.is(Background.solid(0xFF000000, 2)))).
+        create();
 
     protected static final int LISTING_WIDTH = 200, LISTING_HEIGHT = 400;
     protected static final int TREE_HEIGHT = SCREEN_SIZE.y() - LISTING_HEIGHT;
