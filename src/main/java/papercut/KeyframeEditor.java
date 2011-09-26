@@ -45,8 +45,8 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
         switch (kt) {
             case X_LOCATION: return new Slider(0, -500, 500);
             case Y_LOCATION: return new Slider(0, -500, 500);
-            case X_SCALE: return new Slider(1, 0, 10);
-            case Y_SCALE: return new Slider(1, 0, 10);
+            case X_SCALE: return new Slider(1, -10, 10);
+            case Y_SCALE: return new Slider(1, -10, 10);
             case ROTATION: return new Slider(0, 0, MathUtil.TWO_PI);// TAU CAN SUCK IT, GREENWELL
             case ALPHA: return new Slider(1, 0, 1);
             default: throw new RuntimeException("Unhandled keyframe type: " + kt);
