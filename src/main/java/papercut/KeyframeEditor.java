@@ -30,11 +30,11 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
         super(new TableLayout(new Column().fixed().alignRight(), new Column()).gaps(0, 2));
         for (final KeyframeType kt : KeyframeType.values()) {
             Slider slider = createSlider(kt);
+            _sliders.put(kt, slider);
             add(new Label(kt.displayName), slider);
-            slider.value.connect(new Slot<Float> () {
+            slider.valueChanged().connect(new Slot<Float> () {
                 @Override public void onEmit (Float val) {
                     if (_layer == null || _updating) return;
-                    System.out.println("CHANGING " + kt + " TO " + val);
                     _layer.add(kt, _frame, val);
                     edited.emit();
                 }
@@ -77,7 +77,7 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
         _updating = true;
         for (Map.Entry<KeyframeType, Slider> entry : _sliders.entrySet()) {
             float value = _layer.keyframes.get(entry.getKey()).find(_frame).interp(_frame);
-            entry.getValue().value.update(value);
+            entry.getValue().setValue(value);
         }
         _updating = false;
     }
