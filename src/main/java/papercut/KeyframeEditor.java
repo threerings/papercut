@@ -14,20 +14,18 @@ import react.UnitSignal;
 import tripleplay.ui.Elements;
 import tripleplay.ui.Label;
 import tripleplay.ui.Slider;
-import tripleplay.ui.TableLayout.Column;
+import static tripleplay.ui.TableLayout.COL;
 import tripleplay.ui.TableLayout;
 
 import flashbang.anim.rsrc.EditableLayerAnimation;
 import flashbang.anim.rsrc.KeyframeType;
-
-import static flashbang.anim.rsrc.KeyframeType.ROTATION;
 
 public class KeyframeEditor extends Elements<KeyframeEditor>
 {
     public final UnitSignal edited = new UnitSignal();
 
     public KeyframeEditor () {
-        super(new TableLayout(new Column().fixed().alignRight(), new Column()).gaps(0, 2));
+        super(new TableLayout(COL.fixed().alignRight(), COL).gaps(0, 2));
         for (final KeyframeType kt : KeyframeType.values()) {
             Slider slider = createSlider(kt);
             _sliders.put(kt, slider);

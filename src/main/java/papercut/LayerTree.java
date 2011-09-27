@@ -22,7 +22,7 @@ import tripleplay.ui.Group;
 import tripleplay.ui.Label;
 import tripleplay.ui.Selector;
 import tripleplay.ui.Stylesheet;
-import tripleplay.ui.TableLayout.Column;
+import static tripleplay.ui.TableLayout.COL;
 import tripleplay.ui.TableLayout;
 
 import flashbang.anim.rsrc.EditableLayerAnimation;
@@ -37,7 +37,7 @@ public class LayerTree extends Elements<LayerTree>
     public final UnitSignal frameSelected = new UnitSignal();
 
     public LayerTree (EditableModelAnimation animation) {
-        super(new TableLayout(new Column().alignRight().fixed(), new Column().fixed()).gaps(0, 5));
+        super(new TableLayout(COL.alignRight().fixed(), COL.fixed()).gaps(0, 5));
         setStylesheet(CELL);
 
         _anim = animation;
