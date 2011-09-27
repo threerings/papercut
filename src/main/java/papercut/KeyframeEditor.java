@@ -9,6 +9,7 @@ import java.util.Map;
 import pythagoras.f.MathUtil;
 
 import react.Slot;
+import react.UnitSignal;
 
 import tripleplay.ui.Elements;
 import tripleplay.ui.Label;
@@ -23,6 +24,8 @@ import static flashbang.anim.rsrc.KeyframeType.ROTATION;
 
 public class KeyframeEditor extends Elements<KeyframeEditor>
 {
+    public final UnitSignal edited = new UnitSignal();
+
     public KeyframeEditor () {
         super(new TableLayout(new Column().fixed().alignRight(), new Column()).gaps(0, 2));
         for (final KeyframeType kt : KeyframeType.values()) {
@@ -30,8 +33,10 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
             add(new Label(kt.displayName), slider);
             slider.value.connect(new Slot<Float> () {
                 @Override public void onEmit (Float val) {
-                    if (_layer == null || _updatingFrame) return;
+                    if (_layer == null || _updating) return;
+                    System.out.println("CHANGING " + kt + " TO " + val);
                     _layer.add(kt, _frame, val);
+                    edited.emit();
                 }
             });
         }
@@ -54,20 +59,32 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
         }
     }
 
-    public void setFrame (EditableLayerAnimation layer, int frame) {
-        _updatingFrame = true;
-        _frame = frame;
-        _layer = layer;
+    public final Slot<Integer> frameSlot = new Slot<Integer> () {
+        @Override public void onEmit (Integer frame) {
+            _frame = frame;
+            update();
+        }
+    };
+
+    public final Slot<EditableLayerAnimation> layerSlot = new Slot<EditableLayerAnimation> () {
+        @Override public void onEmit (EditableLayerAnimation layer) {
+            _layer = layer;
+            update();
+        }
+    };
+
+    protected void update () {
+        _updating = true;
         for (Map.Entry<KeyframeType, Slider> entry : _sliders.entrySet()) {
-            float value = _layer.keyframes.get(entry.getKey()).find(frame).interp(frame);
+            float value = _layer.keyframes.get(entry.getKey()).find(_frame).interp(_frame);
             entry.getValue().value.update(value);
         }
-        _updatingFrame = false;
+        _updating = false;
     }
 
     protected int _frame;
     protected EditableLayerAnimation _layer;
-    protected boolean _updatingFrame;
+    protected boolean _updating;
 
     protected final Map<KeyframeType, Slider> _sliders =
         new EnumMap<KeyframeType, Slider>(KeyframeType.class);

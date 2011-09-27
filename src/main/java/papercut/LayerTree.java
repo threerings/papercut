@@ -3,6 +3,9 @@
 
 package papercut;
 
+import playn.core.CanvasLayer;
+import playn.core.PlayN;
+
 import pythagoras.f.FloatMath;
 import pythagoras.f.IDimension;
 
@@ -10,9 +13,6 @@ import react.RList;
 import react.Signal;
 import react.UnitSignal;
 import react.UnitSlot;
-
-import playn.core.CanvasLayer;
-import playn.core.PlayN;
 
 import tripleplay.ui.AxisLayout;
 import tripleplay.ui.Background;
@@ -22,8 +22,8 @@ import tripleplay.ui.Group;
 import tripleplay.ui.Label;
 import tripleplay.ui.Selector;
 import tripleplay.ui.Stylesheet;
-import tripleplay.ui.TableLayout;
 import tripleplay.ui.TableLayout.Column;
+import tripleplay.ui.TableLayout;
 
 import flashbang.anim.rsrc.EditableLayerAnimation;
 import flashbang.anim.rsrc.EditableModelAnimation;
@@ -68,7 +68,7 @@ public class LayerTree extends Elements<LayerTree>
                         removeAt(childCount() - 1);
                     }
                     while ((childCount() + 1) * FRAME_WIDTH < hintX) {
-                        add(new Cell(anim, childCount() - 1));
+                        add(new Cell(anim, childCount()));
                     }
                     if (childCount() > 0 && _selector.selected().get() == null) {
                         _selector.setSelected(childAt(0));

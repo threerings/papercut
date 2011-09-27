@@ -14,6 +14,8 @@ import pythagoras.f.Rectangle;
 
 import react.Slot;
 import react.UnitSlot;
+import react.ValueView;
+import react.Values;
 
 import tripleplay.ui.AxisLayout;
 import tripleplay.ui.Background;
@@ -27,6 +29,7 @@ import tripleplay.util.Input;
 import tripleplay.util.MouseInput;
 
 import flashbang.AppMode;
+import flashbang.anim.AnimationController;
 import flashbang.anim.Model;
 import flashbang.anim.rsrc.EditableLayerAnimation;
 import flashbang.anim.rsrc.EditableModelAnimation;
@@ -62,11 +65,26 @@ public class AnimateMode extends AppMode
         }
         _selector = new Selector().add(_listing).setSelected(_listing.childAt(0));
 
-        _editor = _iface.createRoot(AxisLayout.horizontal(), ROOT, modeLayer).
+        _editor = _iface.createRoot(AxisLayout.vertical(), ROOT, modeLayer).
             setStyles(make(VALIGN.top)).
             setBounds(LISTING_WIDTH + STAGE_WIDTH, 0, LISTING_WIDTH, LISTING_HEIGHT);
         final KeyframeEditor editor = new KeyframeEditor();
-        _editor.add(editor);
+        editor.edited.connect(new UnitSlot() {
+            @Override public void onEmit () {
+                _anim.draw(_anim.frame());
+            }
+        });
+
+        final Button playToggle = new Button("Play");
+        final ValueView<Boolean> playing = Values.toggler(playToggle.clicked(), false);
+        playing.connect(new Slot<Boolean> () {
+            @Override public void onEmit (Boolean play) {
+                if (_anim == null) return;
+                _anim.setStopped(!play);
+                playToggle.setText(play ? "Stop" : "Play");
+            }
+        });
+        _editor.add(editor, playToggle);
 
         _tree = _iface.createRoot(AxisLayout.vertical().gap(0), ROOT, modeLayer).
             setStyles(make(VALIGN.top)).setBounds(0, LISTING_HEIGHT, SCREEN_SIZE.x(), TREE_HEIGHT);
@@ -74,7 +92,9 @@ public class AnimateMode extends AppMode
         _tree.add(lt);
         lt.frameSelected.connect(new UnitSlot () {
             @Override public void onEmit () {
-                editor.setFrame(lt.layer(), lt.frame());
+                if (_anim  == null) return;
+                _anim.setFrame(lt.frame());
+                editor.layerSlot.onEmit(lt.layer());
             }
         });
 
@@ -94,6 +114,7 @@ public class AnimateMode extends AppMode
 
             @Override public void onMouseUp (Mouse.ButtonEvent ev) {
                 if (_displayed != null) {
+                    _anim.frameChanged().disconnect(editor.frameSlot);
                     _displayed.destroySelf();
                 }
                 ImageLayerDesc desc = new ImageLayerDesc();
@@ -108,7 +129,9 @@ public class AnimateMode extends AppMode
 
                 _displayed = new Model(_model);
                 _displayed.layer().setTranslation(_listing.size().width(), 0);
-                _displayed.playAnimation("default");
+                _anim = _displayed.play("default");
+                _anim.setStopped(!playing.get());
+                _anim.frameChanged().connect(editor.frameSlot);
                 addObject(_displayed, modeLayer);
             }
 
@@ -146,6 +169,7 @@ public class AnimateMode extends AppMode
         protected final Input.Region _region;
     }
 
+    protected AnimationController _anim;
     protected Root _listing, _tree, _editor;
     protected Interface _iface;
     protected ImageLayer _image;
