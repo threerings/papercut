@@ -29,11 +29,10 @@ import tripleplay.util.Input;
 import tripleplay.util.MouseInput;
 
 import flashbang.AppMode;
-import flashbang.anim.AnimationController;
 import flashbang.anim.Movie;
 import flashbang.anim.rsrc.EditableAnimConf;
-import flashbang.anim.rsrc.EditableMovieImageLayerConf;
 import flashbang.anim.rsrc.EditableMovieConf;
+import flashbang.anim.rsrc.EditableMovieImageLayerConf;
 import flashbang.anim.rsrc.KeyframeType;
 import flashbang.rsrc.ImageResource;
 
@@ -74,7 +73,7 @@ public class AnimateMode extends AppMode
         _playing.connect(new Slot<Boolean> () {
             @Override public void onEmit (Boolean play) {
                 playToggle.setText(play ? "Stop" : "Play");
-                if (_anim == null) return;
+                if (_movie == null) return;
                 play();
             }
         });
@@ -88,9 +87,9 @@ public class AnimateMode extends AppMode
             add(_layerTree);
         _layerTree.frameSelected.connect(new UnitSlot () {
             @Override public void onEmit () {
-                if (_anim  == null) return;
+                if (_movie  == null) return;
                 _editor.setFrame(_layerTree.frame(), _layerTree.anim());
-                _anim.setFrame(_layerTree.frame());
+                _movie.setFrame(_layerTree.frame());
             }
         });
 
@@ -139,16 +138,15 @@ public class AnimateMode extends AppMode
     }
 
     protected void play () {
-        if (_displayed != null) {
-            _displayed.destroySelf();
+        if (_movie != null) {
+            _movie.destroySelf();
         }
 
-        _displayed = _model.build();
-        _displayed.layer().setTranslation(LISTING_WIDTH, 0);
-        _anim = _displayed.play("default");
-        _anim.setStopped(!_playing.get());
-        _anim.setFrame(_layerTree.frame());
-        addObject(_displayed, modeLayer);
+        _movie = _model.build();
+        _movie.layer().setTranslation(LISTING_WIDTH, 0);
+        _movie.setStopped(!_playing.get());
+        _movie.setFrame(_layerTree.frame());
+        addObject(_movie, modeLayer);
     }
 
     @Override public void update (float dt) {
@@ -168,8 +166,7 @@ public class AnimateMode extends AppMode
         protected final Input.Region _region;
     }
 
-    protected Movie _displayed;
-    protected AnimationController _anim;
+    protected Movie _movie;
     protected Interface _iface;
     protected ImageLayer _image;
     protected Selector _selector;

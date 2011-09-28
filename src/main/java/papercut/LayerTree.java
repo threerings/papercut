@@ -25,8 +25,8 @@ import tripleplay.ui.Stylesheet;
 import tripleplay.ui.TableLayout;
 
 import flashbang.anim.rsrc.EditableAnimConf;
-import flashbang.anim.rsrc.EditableMovieLayerConf;
 import flashbang.anim.rsrc.EditableMovieConf;
+import flashbang.anim.rsrc.EditableMovieLayerConf;
 
 import static tripleplay.ui.Style.*;
 import static tripleplay.ui.Styles.make;
