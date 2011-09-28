@@ -83,7 +83,7 @@ public class AnimateMode extends AppMode
 
         _iface.createRoot(AxisLayout.vertical(), ROOT, modeLayer).
             setStyles(make(VALIGN.top)).setBounds(0, LISTING_HEIGHT, SCREEN_SIZE.x(), TREE_HEIGHT).
-            add(_layerTree, new LayerEditor(_movieConf));
+            add(_layerTree, new LayerEditor(_movieConf, _layerTree));
         _layerTree.frameSelected.connect(new UnitSlot () {
             @Override public void onEmit () {
                 if (_movie  == null) return;
@@ -116,11 +116,7 @@ public class AnimateMode extends AppMode
                     ev.x() - LISTING_WIDTH);
                 layerAnim.keyframes.get(KeyframeType.Y_LOCATION).value.update(ev.y());
                 desc.animations.put(_movieConf.animation.get(), layerAnim);
-                EditableMovieGroupLayerConf parent = _movieConf.root;
-                if (_layerTree.layer() instanceof EditableMovieGroupLayerConf) {
-                    parent = (EditableMovieGroupLayerConf)_layerTree.layer();
-                }
-                _movieConf.add(parent , desc);
+                _movieConf.add(_layerTree.groupLayer(), desc);
 
                 play();
             }

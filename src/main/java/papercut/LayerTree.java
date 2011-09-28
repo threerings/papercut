@@ -58,6 +58,20 @@ public class LayerTree extends Elements<LayerTree>
 
     public int frame () { return selected() == null ? 0 : selected().frame; }
 
+    /**
+     * Returns currently selected layer if it's a group layer, the parent of the selected layer if
+     * it isn't, or the root layer if there isn't a selected layer.
+     */
+    public EditableMovieGroupLayerConf groupLayer () {
+        if(layer() != null) {
+            if (layer() instanceof EditableMovieGroupLayerConf) {
+                return (EditableMovieGroupLayerConf)layer();
+            }
+            return _movie.findParent(layer());
+        }
+        return _movie.root;
+    }
+
     public EditableMovieLayerConf layer () { return selected() == null ? null : selected().layer; }
 
     public EditableAnimConf anim () { return layer().animation(_movie.animation.get()); }

@@ -15,12 +15,12 @@ import flashbang.anim.rsrc.MovieConf;
 
 public class LayerEditor extends Elements<LayerEditor>
 {
-    public LayerEditor (final EditableMovieConf conf) {
+    public LayerEditor (final EditableMovieConf conf, final LayerTree tree) {
         super(AxisLayout.horizontal());
         add(_add, _remove, _indent, _dedent);
         _add.clicked().connect(new UnitSlot() {
             @Override public void onEmit () {
-                conf.add(conf.root, new EditableMovieGroupLayerConf("Group"));
+                conf.add(tree.groupLayer(), new EditableMovieGroupLayerConf("Group"));
             }
         });
     }
