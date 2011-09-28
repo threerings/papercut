@@ -36,16 +36,16 @@ public class LayerTree extends Elements<LayerTree>
 {
     public final UnitSignal frameSelected = new UnitSignal();
 
-    public LayerTree (EditableMovieConf model) {
+    public LayerTree (EditableMovieConf movie) {
         super(new TableLayout(COL.alignRight().fixed(), COL.fixed()).gaps(0, 5));
         setStylesheet(CELL);
 
-        _model = model;
+        _movie = movie;
 
-        for (EditableMovieLayerConf layer : model.children) {
+        for (EditableMovieLayerConf layer : movie.children) {
             _layerAddListener.onAdd(layer);
         }
-        model.children.connect(_layerAddListener);
+        movie.children.connect(_layerAddListener);
         _selector.selectedChanged().connect(new UnitSlot () {
             @Override public void onEmit () {
                 frameSelected.emit();
@@ -56,14 +56,14 @@ public class LayerTree extends Elements<LayerTree>
     public int frame () { return selected() == null ? 0 : selected().frame; }
 
     public EditableAnimConf anim () {
-        return selected().layer.animation(_model.animation.get());
+        return selected().layer.animation(_movie.animation.get());
     }
 
     protected Cell selected() { return (Cell)_selector.selected(); }
 
     protected final RList.Listener<EditableMovieLayerConf> _layerAddListener =
         new RList.Listener<EditableMovieLayerConf>() {
-        @Override public void onAdd (final EditableMovieLayerConf modelLayer) {
+        @Override public void onAdd (final EditableMovieLayerConf movieLayer) {
             // TODO - layer nesting
             Group keyframes = new Group(AxisLayout.horizontal().gap(0)) {
                 @Override protected LayoutData computeLayout (float hintX, float hintY) {
@@ -72,7 +72,7 @@ public class LayerTree extends Elements<LayerTree>
                         removeAt(childCount() - 1);
                     }
                     while ((childCount() + 1) * FRAME_WIDTH < hintX) {
-                        add(new Cell(modelLayer, childCount()));
+                        add(new Cell(movieLayer, childCount()));
                     }
                     if (childCount() > 0 && selected() == null) {
                         _selector.setSelected(childAt(0));
@@ -81,11 +81,11 @@ public class LayerTree extends Elements<LayerTree>
                 }
             };
             _selector.add(keyframes);
-            add(new Label(modelLayer.name()), keyframes);
+            add(new Label(movieLayer.name()), keyframes);
         }
     };
 
-    protected final EditableMovieConf _model;
+    protected final EditableMovieConf _movie;
     protected final Selector _selector = new Selector();
 
     protected static class Cell extends Button {

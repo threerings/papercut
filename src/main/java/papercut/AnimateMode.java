@@ -45,8 +45,8 @@ public class AnimateMode extends AppMode
 {
     public AnimateMode (Iterable<String> images) {
         _images = images;
-        _model.animations.add("default");
-        _model.animation.update("default");
+        _movieConf.animations.add("default");
+        _movieConf.animation.update("default");
     }
 
     @Override protected void setup () {
@@ -82,7 +82,7 @@ public class AnimateMode extends AppMode
             setBounds(LISTING_WIDTH + STAGE_WIDTH, 0, LISTING_WIDTH, LISTING_HEIGHT).
             add(_editor, playToggle);
 
-        _iface.createRoot(AxisLayout.vertical().gap(0), ROOT, modeLayer).
+        _iface.createRoot(AxisLayout.vertical(), ROOT, modeLayer).
             setStyles(make(VALIGN.top)).setBounds(0, LISTING_HEIGHT, SCREEN_SIZE.x(), TREE_HEIGHT).
             add(_layerTree);
         _layerTree.frameSelected.connect(new UnitSlot () {
@@ -117,7 +117,7 @@ public class AnimateMode extends AppMode
                     ev.x() - LISTING_WIDTH);
                 layerAnim.keyframes.get(KeyframeType.Y_LOCATION).value.update(ev.y());
                 desc.animations.put("default", layerAnim);
-                _model.children.add(desc);
+                _movieConf.children.add(desc);
 
                 play();
             }
@@ -142,7 +142,7 @@ public class AnimateMode extends AppMode
             _movie.destroySelf();
         }
 
-        _movie = _model.build();
+        _movie = _movieConf.build();
         _movie.layer().setTranslation(LISTING_WIDTH, 0);
         _movie.setStopped(!_playing.get());
         _movie.setFrame(_layerTree.frame());
@@ -172,8 +172,8 @@ public class AnimateMode extends AppMode
     protected Selector _selector;
     protected ValueView<Boolean> _playing;
 
-    protected final EditableMovieConf _model = new EditableMovieConf();
-    protected final LayerTree _layerTree = new LayerTree(_model);
+    protected final EditableMovieConf _movieConf = new EditableMovieConf();
+    protected final LayerTree _layerTree = new LayerTree(_movieConf);
     protected final KeyframeEditor _editor = new KeyframeEditor();
     protected final MouseInput _minput = new MouseInput();
     protected final Iterable<String> _images;
