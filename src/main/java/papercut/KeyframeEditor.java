@@ -16,7 +16,7 @@ import tripleplay.ui.Label;
 import tripleplay.ui.Slider;
 import tripleplay.ui.TableLayout;
 
-import flashbang.anim.rsrc.EditableLayerAnimation;
+import flashbang.anim.rsrc.EditableAnimConf;
 import flashbang.anim.rsrc.KeyframeType;
 
 import static tripleplay.ui.TableLayout.COL;
@@ -33,8 +33,8 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
             add(new Label(kt.displayName), slider);
             slider.valueChanged().connect(new Slot<Float> () {
                 @Override public void onEmit (Float val) {
-                    if (_layer == null || _updating) return;
-                    _layer.add(kt, _frame, val);
+                    if (_anim == null || _updating) return;
+                    _anim.add(kt, _frame, val);
                     edited.emit();
                 }
             });
@@ -58,19 +58,19 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
         }
     }
 
-    public void setFrame (int frame, EditableLayerAnimation anim) {
+    public void setFrame (int frame, EditableAnimConf anim) {
         _frame = frame;
-        _layer = anim;
+        _anim = anim;
         _updating = true;
         for (Map.Entry<KeyframeType, Slider> entry : _sliders.entrySet()) {
-            float value = _layer.keyframes.get(entry.getKey()).find(_frame).interp(_frame);
+            float value = _anim.keyframes.get(entry.getKey()).find(_frame).interp(_frame);
             entry.getValue().setValue(value);
         }
         _updating = false;
     }
 
     protected int _frame;
-    protected EditableLayerAnimation _layer;
+    protected EditableAnimConf _anim;
     protected boolean _updating;
 
     protected final Map<KeyframeType, Slider> _sliders =

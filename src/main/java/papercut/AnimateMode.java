@@ -30,11 +30,10 @@ import tripleplay.util.MouseInput;
 
 import flashbang.AppMode;
 import flashbang.anim.AnimationController;
-import flashbang.anim.Model;
-import flashbang.anim.rsrc.EditableLayerAnimation;
-import flashbang.anim.rsrc.EditableModelImageLayer;
-import flashbang.anim.rsrc.EditableModelResource;
-import flashbang.anim.rsrc.Keyframe;
+import flashbang.anim.Movie;
+import flashbang.anim.rsrc.EditableAnimConf;
+import flashbang.anim.rsrc.EditableMovieImageLayerConf;
+import flashbang.anim.rsrc.EditableMovieConf;
 import flashbang.anim.rsrc.KeyframeType;
 import flashbang.rsrc.ImageResource;
 
@@ -90,7 +89,7 @@ public class AnimateMode extends AppMode
         _layerTree.frameSelected.connect(new UnitSlot () {
             @Override public void onEmit () {
                 if (_anim  == null) return;
-                _editor.setFrame(_layerTree.frame(), _layerTree.layer());
+                _editor.setFrame(_layerTree.frame(), _layerTree.anim());
                 _anim.setFrame(_layerTree.frame());
             }
         });
@@ -110,11 +109,11 @@ public class AnimateMode extends AppMode
             }
 
             @Override public void onMouseUp (Mouse.ButtonEvent ev) {
-                EditableModelImageLayer desc = new EditableModelImageLayer();
+                EditableMovieImageLayerConf desc = new EditableMovieImageLayerConf();
                 desc.imagePath.update(imageName());
                 desc.name.update(imageName());
 
-                EditableLayerAnimation layerAnim = new EditableLayerAnimation();
+                EditableAnimConf layerAnim = new EditableAnimConf();
                 layerAnim.keyframes.get(KeyframeType.X_LOCATION).value.update(
                     ev.x() - LISTING_WIDTH);
                 layerAnim.keyframes.get(KeyframeType.Y_LOCATION).value.update(ev.y());
@@ -169,14 +168,14 @@ public class AnimateMode extends AppMode
         protected final Input.Region _region;
     }
 
-    protected Model _displayed;
+    protected Movie _displayed;
     protected AnimationController _anim;
     protected Interface _iface;
     protected ImageLayer _image;
     protected Selector _selector;
     protected ValueView<Boolean> _playing;
 
-    protected final EditableModelResource _model = new EditableModelResource();
+    protected final EditableMovieConf _model = new EditableMovieConf();
     protected final LayerTree _layerTree = new LayerTree(_model);
     protected final KeyframeEditor _editor = new KeyframeEditor();
     protected final MouseInput _minput = new MouseInput();

@@ -24,9 +24,9 @@ import tripleplay.ui.Selector;
 import tripleplay.ui.Stylesheet;
 import tripleplay.ui.TableLayout;
 
-import flashbang.anim.rsrc.EditableLayerAnimation;
-import flashbang.anim.rsrc.EditableModelLayer;
-import flashbang.anim.rsrc.EditableModelResource;
+import flashbang.anim.rsrc.EditableAnimConf;
+import flashbang.anim.rsrc.EditableMovieLayerConf;
+import flashbang.anim.rsrc.EditableMovieConf;
 
 import static tripleplay.ui.Style.*;
 import static tripleplay.ui.Styles.make;
@@ -36,13 +36,13 @@ public class LayerTree extends Elements<LayerTree>
 {
     public final UnitSignal frameSelected = new UnitSignal();
 
-    public LayerTree (EditableModelResource model) {
+    public LayerTree (EditableMovieConf model) {
         super(new TableLayout(COL.alignRight().fixed(), COL.fixed()).gaps(0, 5));
         setStylesheet(CELL);
 
         _model = model;
 
-        for (EditableModelLayer layer : model.children) {
+        for (EditableMovieLayerConf layer : model.children) {
             _layerAddListener.onAdd(layer);
         }
         model.children.connect(_layerAddListener);
@@ -55,15 +55,15 @@ public class LayerTree extends Elements<LayerTree>
 
     public int frame () { return selected() == null ? 0 : selected().frame; }
 
-    public EditableLayerAnimation layer () {
+    public EditableAnimConf anim () {
         return selected().layer.animation(_model.animation.get());
     }
 
     protected Cell selected() { return (Cell)_selector.selected(); }
 
-    protected final RList.Listener<EditableModelLayer> _layerAddListener =
-        new RList.Listener<EditableModelLayer>() {
-        @Override public void onAdd (final EditableModelLayer modelLayer) {
+    protected final RList.Listener<EditableMovieLayerConf> _layerAddListener =
+        new RList.Listener<EditableMovieLayerConf>() {
+        @Override public void onAdd (final EditableMovieLayerConf modelLayer) {
             // TODO - layer nesting
             Group keyframes = new Group(AxisLayout.horizontal().gap(0)) {
                 @Override protected LayoutData computeLayout (float hintX, float hintY) {
@@ -85,14 +85,14 @@ public class LayerTree extends Elements<LayerTree>
         }
     };
 
-    protected final EditableModelResource _model;
+    protected final EditableMovieConf _model;
     protected final Selector _selector = new Selector();
 
     protected static class Cell extends Button {
         public final int frame;
-        public final EditableModelLayer layer;
+        public final EditableMovieLayerConf layer;
 
-        public Cell (EditableModelLayer layer, int frame) {
+        public Cell (EditableMovieLayerConf layer, int frame) {
             this.layer = layer;
             this.frame = frame;
         }
