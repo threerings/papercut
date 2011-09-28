@@ -14,11 +14,12 @@ import react.UnitSignal;
 import tripleplay.ui.Elements;
 import tripleplay.ui.Label;
 import tripleplay.ui.Slider;
-import static tripleplay.ui.TableLayout.COL;
 import tripleplay.ui.TableLayout;
 
 import flashbang.anim.rsrc.EditableLayerAnimation;
 import flashbang.anim.rsrc.KeyframeType;
+
+import static tripleplay.ui.TableLayout.COL;
 
 public class KeyframeEditor extends Elements<KeyframeEditor>
 {
@@ -57,21 +58,9 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
         }
     }
 
-    public final Slot<Integer> frameSlot = new Slot<Integer> () {
-        @Override public void onEmit (Integer frame) {
-            _frame = frame;
-            update();
-        }
-    };
-
-    public final Slot<EditableLayerAnimation> layerSlot = new Slot<EditableLayerAnimation> () {
-        @Override public void onEmit (EditableLayerAnimation layer) {
-            _layer = layer;
-            update();
-        }
-    };
-
-    protected void update () {
+    public void setFrame (int frame, EditableLayerAnimation anim) {
+        _frame = frame;
+        _layer = anim;
         _updating = true;
         for (Map.Entry<KeyframeType, Slider> entry : _sliders.entrySet()) {
             float value = _layer.keyframes.get(entry.getKey()).find(_frame).interp(_frame);

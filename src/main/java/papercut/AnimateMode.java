@@ -32,12 +32,10 @@ import flashbang.AppMode;
 import flashbang.anim.AnimationController;
 import flashbang.anim.Model;
 import flashbang.anim.rsrc.EditableLayerAnimation;
-import flashbang.anim.rsrc.EditableModelAnimation;
+import flashbang.anim.rsrc.EditableModelImageLayer;
 import flashbang.anim.rsrc.EditableModelResource;
-import flashbang.anim.rsrc.ImageLayerDesc;
 import flashbang.anim.rsrc.Keyframe;
 import flashbang.anim.rsrc.KeyframeType;
-import flashbang.anim.rsrc.ModelResource;
 import flashbang.rsrc.ImageResource;
 
 import static papercut.PapercutApp.SCREEN_SIZE;
@@ -49,7 +47,8 @@ public class AnimateMode extends AppMode
 {
     public AnimateMode (Iterable<String> images) {
         _images = images;
-        _model.animations.put("default", new EditableModelAnimation());
+        _model.animations.add("default");
+        _model.animation.update("default");
     }
 
     @Override protected void setup () {
@@ -58,43 +57,41 @@ public class AnimateMode extends AppMode
         _iface = new Interface(pointerListener());
         PlayN.pointer().setListener(_iface.plistener);
 
-        _listing = _iface.createRoot(AxisLayout.vertical().gap(0), ROOT, modeLayer).
+        Root listingRoot = _iface.createRoot(AxisLayout.vertical().gap(0), ROOT, modeLayer).
             setStyles(make(HALIGN.left, VALIGN.top)).setSize(LISTING_WIDTH, LISTING_HEIGHT);
         for (String image : _images) {
-            _listing.add(new Button().setText(image));
+            listingRoot.add(new Button().setText(image));
         }
-        _selector = new Selector().add(_listing).setSelected(_listing.childAt(0));
+        _selector = new Selector().add(listingRoot).setSelected(listingRoot.childAt(0));
 
-        _editor = _iface.createRoot(AxisLayout.vertical(), ROOT, modeLayer).
-            setStyles(make(VALIGN.top)).
-            setBounds(LISTING_WIDTH + STAGE_WIDTH, 0, LISTING_WIDTH, LISTING_HEIGHT);
-        final KeyframeEditor editor = new KeyframeEditor();
-        editor.edited.connect(new UnitSlot() {
+        _editor.edited.connect(new UnitSlot() {
             @Override public void onEmit () {
-                _anim.draw(_anim.frame());
+                play();
             }
         });
 
         final Button playToggle = new Button("Play");
-        final ValueView<Boolean> playing = Values.toggler(playToggle.clicked(), false);
-        playing.connect(new Slot<Boolean> () {
+        _playing = Values.toggler(playToggle.clicked(), false);
+        _playing.connect(new Slot<Boolean> () {
             @Override public void onEmit (Boolean play) {
-                if (_anim == null) return;
-                _anim.setStopped(!play);
                 playToggle.setText(play ? "Stop" : "Play");
+                if (_anim == null) return;
+                play();
             }
         });
-        _editor.add(editor, playToggle);
+        _iface.createRoot(AxisLayout.vertical(), ROOT, modeLayer).
+            setStyles(make(VALIGN.top)).
+            setBounds(LISTING_WIDTH + STAGE_WIDTH, 0, LISTING_WIDTH, LISTING_HEIGHT).
+            add(_editor, playToggle);
 
-        _tree = _iface.createRoot(AxisLayout.vertical().gap(0), ROOT, modeLayer).
-            setStyles(make(VALIGN.top)).setBounds(0, LISTING_HEIGHT, SCREEN_SIZE.x(), TREE_HEIGHT);
-        final LayerTree lt = new LayerTree(_model.animations.get("default"));
-        _tree.add(lt);
-        lt.frameSelected.connect(new UnitSlot () {
+        _iface.createRoot(AxisLayout.vertical().gap(0), ROOT, modeLayer).
+            setStyles(make(VALIGN.top)).setBounds(0, LISTING_HEIGHT, SCREEN_SIZE.x(), TREE_HEIGHT).
+            add(_layerTree);
+        _layerTree.frameSelected.connect(new UnitSlot () {
             @Override public void onEmit () {
                 if (_anim  == null) return;
-                _anim.setFrame(lt.frame());
-                editor.layerSlot.onEmit(lt.layer());
+                _editor.setFrame(_layerTree.frame(), _layerTree.layer());
+                _anim.setFrame(_layerTree.frame());
             }
         });
 
@@ -113,29 +110,19 @@ public class AnimateMode extends AppMode
             }
 
             @Override public void onMouseUp (Mouse.ButtonEvent ev) {
-                if (_displayed != null) {
-                    _anim.frameChanged().disconnect(editor.frameSlot);
-                    _displayed.destroySelf();
-                }
-                ImageLayerDesc desc = new ImageLayerDesc();
-                desc.imageName = desc.name = imageName();
-                _model.layers.add(desc);
+                EditableModelImageLayer desc = new EditableModelImageLayer();
+                desc.imagePath.update(imageName());
+                desc.name.update(imageName());
 
-                EditableLayerAnimation layerAnim = new EditableLayerAnimation(desc.imageName);
+                EditableLayerAnimation layerAnim = new EditableLayerAnimation();
                 layerAnim.keyframes.get(KeyframeType.X_LOCATION).value.update(
-                    ev.x() - _listing.size().width());
+                    ev.x() - LISTING_WIDTH);
                 layerAnim.keyframes.get(KeyframeType.Y_LOCATION).value.update(ev.y());
-                _model.animations.get("default").layers.add(layerAnim);
+                desc.animations.put("default", layerAnim);
+                _model.children.add(desc);
 
-                _displayed = new Model(_model);
-                _displayed.layer().setTranslation(_listing.size().width(), 0);
-                _anim = _displayed.play("default");
-                _anim.setStopped(!playing.get());
-                _anim.frameChanged().connect(editor.frameSlot);
-                addObject(_displayed, modeLayer);
+                play();
             }
-
-            protected Model _displayed;
         });
 
         _minput.register(new NotRegion(stageRegion), new Mouse.Adapter() {
@@ -149,7 +136,20 @@ public class AnimateMode extends AppMode
     }
 
     protected String imageName () {
-        return ((Button)_selector.selected().get()).text();
+        return ((Button)_selector.selected()).text();
+    }
+
+    protected void play () {
+        if (_displayed != null) {
+            _displayed.destroySelf();
+        }
+
+        _displayed = _model.build();
+        _displayed.layer().setTranslation(LISTING_WIDTH, 0);
+        _anim = _displayed.play("default");
+        _anim.setStopped(!_playing.get());
+        _anim.setFrame(_layerTree.frame());
+        addObject(_displayed, modeLayer);
     }
 
     @Override public void update (float dt) {
@@ -169,12 +169,16 @@ public class AnimateMode extends AppMode
         protected final Input.Region _region;
     }
 
+    protected Model _displayed;
     protected AnimationController _anim;
-    protected Root _listing, _tree, _editor;
     protected Interface _iface;
     protected ImageLayer _image;
-    protected EditableModelResource _model = new EditableModelResource();
     protected Selector _selector;
+    protected ValueView<Boolean> _playing;
+
+    protected final EditableModelResource _model = new EditableModelResource();
+    protected final LayerTree _layerTree = new LayerTree(_model);
+    protected final KeyframeEditor _editor = new KeyframeEditor();
     protected final MouseInput _minput = new MouseInput();
     protected final Iterable<String> _images;
 

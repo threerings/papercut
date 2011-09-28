@@ -22,44 +22,48 @@ import tripleplay.ui.Group;
 import tripleplay.ui.Label;
 import tripleplay.ui.Selector;
 import tripleplay.ui.Stylesheet;
-import static tripleplay.ui.TableLayout.COL;
 import tripleplay.ui.TableLayout;
 
 import flashbang.anim.rsrc.EditableLayerAnimation;
-import flashbang.anim.rsrc.EditableModelAnimation;
-import flashbang.anim.rsrc.ModelAnimation;
+import flashbang.anim.rsrc.EditableModelLayer;
+import flashbang.anim.rsrc.EditableModelResource;
 
 import static tripleplay.ui.Style.*;
 import static tripleplay.ui.Styles.make;
+import static tripleplay.ui.TableLayout.COL;
 
 public class LayerTree extends Elements<LayerTree>
 {
     public final UnitSignal frameSelected = new UnitSignal();
 
-    public LayerTree (EditableModelAnimation animation) {
+    public LayerTree (EditableModelResource model) {
         super(new TableLayout(COL.alignRight().fixed(), COL.fixed()).gaps(0, 5));
         setStylesheet(CELL);
 
-        _anim = animation;
+        _model = model;
 
-        for (EditableLayerAnimation layer : _anim.layers()) {
+        for (EditableModelLayer layer : model.children) {
             _layerAddListener.onAdd(layer);
         }
-        animation.layers.connect(_layerAddListener);
-        _selector.selected().connect(new UnitSlot () {
+        model.children.connect(_layerAddListener);
+        _selector.selectedChanged().connect(new UnitSlot () {
             @Override public void onEmit () {
                 frameSelected.emit();
             }
         });
     }
 
-    public int frame () { return ((Cell)_selector.selected().get()).frame; }
+    public int frame () { return selected() == null ? 0 : selected().frame; }
 
-    public EditableLayerAnimation layer () { return ((Cell)_selector.selected().get()).layer; }
+    public EditableLayerAnimation layer () {
+        return selected().layer.animation(_model.animation.get());
+    }
 
-    protected final RList.Listener<EditableLayerAnimation> _layerAddListener =
-        new RList.Listener<EditableLayerAnimation>() {
-        @Override public void onAdd (final EditableLayerAnimation anim) {
+    protected Cell selected() { return (Cell)_selector.selected(); }
+
+    protected final RList.Listener<EditableModelLayer> _layerAddListener =
+        new RList.Listener<EditableModelLayer>() {
+        @Override public void onAdd (final EditableModelLayer modelLayer) {
             // TODO - layer nesting
             Group keyframes = new Group(AxisLayout.horizontal().gap(0)) {
                 @Override protected LayoutData computeLayout (float hintX, float hintY) {
@@ -68,27 +72,27 @@ public class LayerTree extends Elements<LayerTree>
                         removeAt(childCount() - 1);
                     }
                     while ((childCount() + 1) * FRAME_WIDTH < hintX) {
-                        add(new Cell(anim, childCount()));
+                        add(new Cell(modelLayer, childCount()));
                     }
-                    if (childCount() > 0 && _selector.selected().get() == null) {
+                    if (childCount() > 0 && selected() == null) {
                         _selector.setSelected(childAt(0));
                     }
                     return ld;
                 }
             };
             _selector.add(keyframes);
-            add(new Label(anim.layerSelector()), keyframes);
+            add(new Label(modelLayer.name()), keyframes);
         }
     };
 
-    protected final EditableModelAnimation _anim;
+    protected final EditableModelResource _model;
     protected final Selector _selector = new Selector();
 
     protected static class Cell extends Button {
         public final int frame;
-        public final EditableLayerAnimation layer;
+        public final EditableModelLayer layer;
 
-        public Cell (EditableLayerAnimation layer, int frame) {
+        public Cell (EditableModelLayer layer, int frame) {
             this.layer = layer;
             this.frame = frame;
         }
