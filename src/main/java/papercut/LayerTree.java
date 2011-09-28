@@ -6,7 +6,6 @@ package papercut;
 import pythagoras.f.FloatMath;
 import pythagoras.f.IDimension;
 
-import react.RList;
 import react.Signal;
 import react.UnitSignal;
 import react.UnitSlot;
@@ -21,11 +20,13 @@ import tripleplay.ui.Elements;
 import tripleplay.ui.Group;
 import tripleplay.ui.Label;
 import tripleplay.ui.Selector;
+import tripleplay.ui.Styles;
 import tripleplay.ui.Stylesheet;
 import tripleplay.ui.TableLayout;
 
 import flashbang.anim.rsrc.EditableAnimConf;
 import flashbang.anim.rsrc.EditableMovieConf;
+import flashbang.anim.rsrc.EditableMovieGroupLayerConf;
 import flashbang.anim.rsrc.EditableMovieLayerConf;
 
 import static tripleplay.ui.Style.*;
@@ -42,52 +43,59 @@ public class LayerTree extends Elements<LayerTree>
 
         _movie = movie;
 
-        for (EditableMovieLayerConf layer : movie.root.children) {
-            _layerAddListener.onAdd(layer);
-        }
-        movie.root.children.connect(_layerAddListener);
+        movie.treeChanged.connect(new UnitSlot () {
+            @Override public void onEmit () {
+                rebuild();
+            }
+        });
         _selector.selectedChanged().connect(new UnitSlot () {
             @Override public void onEmit () {
                 frameSelected.emit();
             }
         });
+        rebuild();
     }
 
     public int frame () { return selected() == null ? 0 : selected().frame; }
 
-    public EditableMovieLayerConf layer () {
-        return selected() == null ? null : selected().layer;
-    }
+    public EditableMovieLayerConf layer () { return selected() == null ? null : selected().layer; }
 
-    public EditableAnimConf anim () {
-        return layer().animation(_movie.animation.get());
-    }
+    public EditableAnimConf anim () { return layer().animation(_movie.animation.get()); }
 
     protected Cell selected() { return (Cell)_selector.selected(); }
 
-    protected final RList.Listener<EditableMovieLayerConf> _layerAddListener =
-        new RList.Listener<EditableMovieLayerConf>() {
-        @Override public void onAdd (final EditableMovieLayerConf movieLayer) {
-            // TODO - layer nesting
-            Group keyframes = new Group(AxisLayout.horizontal().gap(0)) {
-                @Override protected LayoutData computeLayout (float hintX, float hintY) {
-                    LayoutData ld = super.computeLayout(hintX, hintY);
-                    while (childCount() * FRAME_WIDTH > hintX) {
-                        removeAt(childCount() - 1);
-                    }
-                    while ((childCount() + 1) * FRAME_WIDTH < hintX) {
-                        add(new Cell(movieLayer, childCount()));
-                    }
-                    if (childCount() > 0 && selected() == null) {
-                        _selector.setSelected(childAt(0));
-                    }
-                    return ld;
-                }
-            };
-            _selector.add(keyframes);
-            add(new Label(movieLayer.name()), keyframes);
+    protected void rebuild () {
+        removeAll();
+        for (EditableMovieLayerConf child : _movie.root.children) {
+            add(child, 0);
         }
-    };
+    }
+
+    protected void add (final EditableMovieLayerConf movieLayer, int indent) {
+        Group keyframes = new Group(AxisLayout.horizontal().gap(0)) {
+            @Override protected LayoutData computeLayout (float hintX, float hintY) {
+                LayoutData ld = super.computeLayout(hintX, hintY);
+                while (childCount() * FRAME_WIDTH > hintX) {
+                    removeAt(childCount() - 1);
+                }
+                while ((childCount() + 1) * FRAME_WIDTH < hintX) {
+                    add(new Cell(movieLayer, childCount()));
+                }
+                if (childCount() > 0 && selected() == null) {
+                    _selector.setSelected(childAt(0));
+                }
+                return ld;
+            }
+        };
+        _selector.add(keyframes);
+        Background indenter = Background.solid(0xFFFFFFFF, 0, 5 * indent, 0, 0);
+        add(new Label(movieLayer.name(), make(BACKGROUND.is(indenter))), keyframes);
+        if (movieLayer instanceof EditableMovieGroupLayerConf) {
+            for (EditableMovieLayerConf child : ((EditableMovieGroupLayerConf)movieLayer).children) {
+                add(child, indent + 1);
+            }
+        }
+    }
 
     protected final EditableMovieConf _movie;
     protected final Selector _selector = new Selector();
