@@ -48,11 +48,6 @@ public class LayerTree extends Elements<LayerTree>
                 rebuild();
             }
         });
-        _selector.selectedChanged().connect(new UnitSlot () {
-            @Override public void onEmit () {
-                frameSelected.emit();
-            }
-        });
         rebuild();
     }
 
@@ -63,7 +58,7 @@ public class LayerTree extends Elements<LayerTree>
      * it isn't, or the root layer if there isn't a selected layer.
      */
     public EditableMovieGroupLayerConf groupLayer () {
-        if(layer() != null) {
+        if (layer() != null) {
             if (layer() instanceof EditableMovieGroupLayerConf) {
                 return (EditableMovieGroupLayerConf)layer();
             }
@@ -80,6 +75,12 @@ public class LayerTree extends Elements<LayerTree>
 
     protected void rebuild () {
         removeAll();
+        _selector = new Selector();
+        _selector.selectedChanged().connect(new UnitSlot () {
+            @Override public void onEmit () {
+                frameSelected.emit();
+            }
+        });
         for (EditableMovieLayerConf child : _movie.root.children) {
             add(child, 0);
         }
@@ -111,8 +112,9 @@ public class LayerTree extends Elements<LayerTree>
         }
     }
 
+    protected Selector _selector;
+
     protected final EditableMovieConf _movie;
-    protected final Selector _selector = new Selector();
 
     protected static class Cell extends Button {
         public final int frame;
