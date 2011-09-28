@@ -61,11 +61,13 @@ public class AnimateMode extends AppMode
         }
         _selector = new Selector().add(listingRoot).setSelected(listingRoot.childAt(0));
 
-        _editor.edited.connect(new UnitSlot() {
+        UnitSlot playSlot = new UnitSlot() {
             @Override public void onEmit () {
                 play();
             }
-        });
+        };
+        _editor.edited.connect(playSlot);
+        _movieConf.treeChanged.connect(playSlot);
 
         final Button playToggle = new Button("Play");
         _playing = Values.toggler(playToggle.clicked(), false);
@@ -117,8 +119,6 @@ public class AnimateMode extends AppMode
                 layerAnim.keyframes.get(KeyframeType.Y_LOCATION).value.update(ev.y());
                 desc.animations.put(_movieConf.animation.get(), layerAnim);
                 _movieConf.add(_layerTree.groupLayer(), desc);
-
-                play();
             }
         });
 
@@ -139,7 +139,9 @@ public class AnimateMode extends AppMode
     protected void play () {
         if (_movie != null) {
             _movie.destroySelf();
+            _movie = null;
         }
+        if (_movieConf.root.children.isEmpty()) return;
 
         _movie = _movieConf.build();
         _movie.layer().setTranslation(LISTING_WIDTH, 0);
