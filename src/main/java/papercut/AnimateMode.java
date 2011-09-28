@@ -3,12 +3,6 @@
 
 package papercut;
 
-import playn.core.Font;
-import playn.core.ImageLayer;
-import playn.core.Layer;
-import playn.core.Mouse;
-import playn.core.PlayN;
-
 import pythagoras.f.IPoint;
 import pythagoras.f.Rectangle;
 
@@ -16,6 +10,12 @@ import react.Slot;
 import react.UnitSlot;
 import react.ValueView;
 import react.Values;
+
+import playn.core.Font;
+import playn.core.ImageLayer;
+import playn.core.Layer;
+import playn.core.Mouse;
+import playn.core.PlayN;
 
 import tripleplay.ui.AxisLayout;
 import tripleplay.ui.Background;
@@ -32,6 +32,7 @@ import flashbang.AppMode;
 import flashbang.anim.Movie;
 import flashbang.anim.rsrc.EditableAnimConf;
 import flashbang.anim.rsrc.EditableMovieConf;
+import flashbang.anim.rsrc.EditableMovieGroupLayerConf;
 import flashbang.anim.rsrc.EditableMovieImageLayerConf;
 import flashbang.anim.rsrc.KeyframeType;
 import flashbang.rsrc.ImageResource;
@@ -45,8 +46,6 @@ public class AnimateMode extends AppMode
 {
     public AnimateMode (Iterable<String> images) {
         _images = images;
-        _movieConf.animations.add("default");
-        _movieConf.animation.update("default");
     }
 
     @Override protected void setup () {
@@ -84,7 +83,7 @@ public class AnimateMode extends AppMode
 
         _iface.createRoot(AxisLayout.vertical(), ROOT, modeLayer).
             setStyles(make(VALIGN.top)).setBounds(0, LISTING_HEIGHT, SCREEN_SIZE.x(), TREE_HEIGHT).
-            add(_layerTree);
+            add(_layerTree, new LayerEditor(_movieConf));
         _layerTree.frameSelected.connect(new UnitSlot () {
             @Override public void onEmit () {
                 if (_movie  == null) return;
@@ -116,8 +115,12 @@ public class AnimateMode extends AppMode
                 layerAnim.keyframes.get(KeyframeType.X_LOCATION).value.update(
                     ev.x() - LISTING_WIDTH);
                 layerAnim.keyframes.get(KeyframeType.Y_LOCATION).value.update(ev.y());
-                desc.animations.put("default", layerAnim);
-                _movieConf.children.add(desc);
+                desc.animations.put(_movieConf.animation.get(), layerAnim);
+                EditableMovieGroupLayerConf parent = _movieConf.root;
+                if (_layerTree.layer() instanceof EditableMovieGroupLayerConf) {
+                    parent = (EditableMovieGroupLayerConf)_layerTree.layer();
+                }
+                _movieConf.add(parent , desc);
 
                 play();
             }

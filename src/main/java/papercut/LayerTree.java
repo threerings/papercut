@@ -3,9 +3,6 @@
 
 package papercut;
 
-import playn.core.CanvasLayer;
-import playn.core.PlayN;
-
 import pythagoras.f.FloatMath;
 import pythagoras.f.IDimension;
 
@@ -13,6 +10,9 @@ import react.RList;
 import react.Signal;
 import react.UnitSignal;
 import react.UnitSlot;
+
+import playn.core.CanvasLayer;
+import playn.core.PlayN;
 
 import tripleplay.ui.AxisLayout;
 import tripleplay.ui.Background;
@@ -42,10 +42,10 @@ public class LayerTree extends Elements<LayerTree>
 
         _movie = movie;
 
-        for (EditableMovieLayerConf layer : movie.children) {
+        for (EditableMovieLayerConf layer : movie.root.children) {
             _layerAddListener.onAdd(layer);
         }
-        movie.children.connect(_layerAddListener);
+        movie.root.children.connect(_layerAddListener);
         _selector.selectedChanged().connect(new UnitSlot () {
             @Override public void onEmit () {
                 frameSelected.emit();
@@ -55,8 +55,12 @@ public class LayerTree extends Elements<LayerTree>
 
     public int frame () { return selected() == null ? 0 : selected().frame; }
 
+    public EditableMovieLayerConf layer () {
+        return selected() == null ? null : selected().layer;
+    }
+
     public EditableAnimConf anim () {
-        return selected().layer.animation(_movie.animation.get());
+        return layer().animation(_movie.animation.get());
     }
 
     protected Cell selected() { return (Cell)_selector.selected(); }
