@@ -1,65 +1,53 @@
-{ "resources":[
-    { "type":"image", "name":"streetwalker/SW_arm.png" },
-    { "type":"image", "name":"streetwalker/SW_body.png" },
-    { "type":"image", "name":"streetwalker/SW_skirt_bottom.png" },
-
-    { "type":"model", "name":"streetwalker",
-      "rootLayer":{
-          "type":"GroupLayer", "name":"root", "x":0, "y":0, "scaleX":1, "scaleY":1, "rotation":0, "alpha":1, "visible":true, "originX":0, "originY":0, "depth":0,
-          "children":[
-             {
-                "type":"GroupLayer",
-                "name":"body",
-                "x":4,
-                "y":-3,
-                "scaleX":1,
-                "scaleY":1,
-                "rotation":0,
-                "alpha":1,
-                "visible":true,
-                "originX":0,
-                "originY":0,
-                "depth":0,
-                "children":[
-                   { "type":"ImageLayer", "name":"arm_right", "image":"streetwalker/SW_arm.png", "x":-20, "y":-51, "scaleX":1, "scaleY":1, "rotation":0, "alpha":1, "visible":true, "originX":6, "originY":1, "depth":0 },
-                   { "type":"ImageLayer", "name":"body", "image":"streetwalker/SW_body.png", "x":-32,"y":-73,"scaleX":1, "scaleY":1, "rotation":0, "alpha":1, "visible":true, "originX":0, "originY":0, "depth":1 },
-                   { "type":"ImageLayer", "name":"arm_left", "image":"streetwalker/SW_arm.png", "x":-13, "y":-51, "scaleX":1, "scaleY":1, "rotation":0, "alpha":1, "visible":true, "originX":6, "originY":1, "depth":2 }
+{
+  "movies" : [
+  {
+    "name" : "streetwalker_nw",
+    "children" : [
+    {
+      "type" : "Group",
+      "name" : "Group",
+      "animations" : {
+        "default" : {
+          "name" : "default",
+          "keyframes" : {
+            "X_LOCATION" : [
+            { "frame" : 15, "value" : 50 }
+            ]
+          }
+        }
+      } ,
+      "children" : [
+        {
+          "type" : "Image",
+          "name" : "streetwalker/NW_skirt_bottom.png",
+          "animations" : {
+            "default" : {
+              "keyframes" : {
+                "ROTATION" : [
+                { "frame" : 10, "value": 1.5 }
                 ]
-             },
-             { "type":"ImageLayer", "image":"streetwalker/SW_skirt_bottom.png", "x":-12, "y":-5, "scaleX":1, "scaleY":1, "rotation":0, "alpha":1, "visible":true, "originX":0, "originY":0, "depth":0 }
-          ]
-       },
-       "anims":{
-           "stand_SW":{ "framerate":30, "endBehavior":"LOOP",
-               "layerAnims":[
-                 {
-                     "layerSelector":"root/body",
-                     "keyframes":[
-                        { "frameIdx":0, "interp":"EASE_INOUT", "x":4, "y":-3, "scaleX":1, "scaleY":1, "rotation":0.061086523819801536, "visible":true, "alpha":1 },
-                        { "frameIdx":36, "interp":"EASE_INOUT", "x":4, "y":-3, "scaleX":1, "scaleY":1, "rotation":0, "visible":true, "alpha":1 },
-                        { "frameIdx":72, "interp":"EASE_INOUT", "x":4, "y":-3, "scaleX":1, "scaleY":1, "rotation":0.061086523819801536, "visible":true, "alpha":1 }
-                     ]
-                 },
-                 {
-                      "layerSelector":"root/body/arm_left",
-                      "keyframes":[
-                         { "frameIdx":0, "interp":"EASE_INOUT", "x":-13, "y":-51, "scaleX":1, "scaleY":1, "rotation":0.0523598775598, "visible":true, "alpha":1 },
-                         { "frameIdx":36, "interp":"EASE_INOUT", "x":-13, "y":-51, "scaleX":1, "scaleY":1, "rotation":-0.2617993877991494, "visible":true, "alpha":1 },
-                         { "frameIdx":72, "interp":"EASE_INOUT", "x":-13, "y":-51, "scaleX":1, "scaleY":1, "rotation":0.0523598775598, "visible":true, "alpha":1 }
-                      ]
-                  },
-                  {
-                        "layerSelector":"root/body/arm_right",
-                        "keyframes":[
-                           { "frameIdx":0, "interp":"EASE_INOUT", "x":-20, "y":-51, "scaleX":1, "scaleY":1, "rotation":0.0523598775598, "visible":true, "alpha":1 },
-                           { "frameIdx":36, "interp":"EASE_INOUT", "x":-20, "y":-51, "scaleX":1, "scaleY":1, "rotation":-0.2617993877991494, "visible":true, "alpha":1 },
-                           { "frameIdx":72, "interp":"EASE_INOUT", "x":-20, "y":-51, "scaleX":1, "scaleY":1, "rotation":0.0523598775598, "visible":true, "alpha":1 }
-                        ]
-                  }
-               ]
-           }
-       },
-       "defaultAnimation":"stand_SW"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type" : "Image",
+      "name" : "streetwalker/NW_body.png",
+      "animations" : {
+        "default" :{
+          "type" : "Anim",
+          "name" : "default",
+          "keyframes" : {
+            "ALPHA" : [
+            {"type" : "Keyframe", "frame" : 30, "value" : 0}
+            ]
+          }
+        }
+      }
     }
+    ]
+  }
   ]
 }

@@ -13,6 +13,7 @@ import react.Values;
 
 import playn.core.Font;
 import playn.core.ImageLayer;
+import playn.core.Json;
 import playn.core.Layer;
 import playn.core.Mouse;
 import playn.core.PlayN;
@@ -32,10 +33,10 @@ import flashbang.AppMode;
 import flashbang.anim.Movie;
 import flashbang.anim.rsrc.EditableAnimConf;
 import flashbang.anim.rsrc.EditableMovieConf;
-import flashbang.anim.rsrc.EditableMovieGroupLayerConf;
 import flashbang.anim.rsrc.EditableMovieImageLayerConf;
 import flashbang.anim.rsrc.KeyframeType;
 import flashbang.rsrc.ImageResource;
+import flashbang.rsrc.JsonResource;
 
 import static papercut.PapercutApp.SCREEN_SIZE;
 
@@ -46,6 +47,9 @@ public class AnimateMode extends AppMode
 {
     public AnimateMode (Iterable<String> images) {
         _images = images;
+        Json.Object root = JsonResource.require("streetwalker/streetwalker.json").json();
+        _movieConf = new EditableMovieConf(root.getArray("movies", Json.Object.class).get(0));
+        _layerTree = new LayerTree(_movieConf);
     }
 
     @Override protected void setup () {
@@ -110,7 +114,6 @@ public class AnimateMode extends AppMode
 
             @Override public void onMouseUp (Mouse.ButtonEvent ev) {
                 EditableMovieImageLayerConf desc = new EditableMovieImageLayerConf();
-                desc.imagePath.update(imageName());
                 desc.name.update(imageName());
 
                 EditableAnimConf layerAnim = new EditableAnimConf();
@@ -130,6 +133,7 @@ public class AnimateMode extends AppMode
                 }
             }
         });
+        play();
     }
 
     protected String imageName () {
@@ -173,8 +177,8 @@ public class AnimateMode extends AppMode
     protected Selector _selector;
     protected ValueView<Boolean> _playing;
 
-    protected final EditableMovieConf _movieConf = new EditableMovieConf();
-    protected final LayerTree _layerTree = new LayerTree(_movieConf);
+    protected final EditableMovieConf _movieConf;
+    protected final LayerTree _layerTree;
     protected final KeyframeEditor _editor = new KeyframeEditor();
     protected final MouseInput _minput = new MouseInput();
     protected final Iterable<String> _images;

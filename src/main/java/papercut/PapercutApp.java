@@ -6,14 +6,15 @@ package papercut;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
+import pythagoras.i.Point;
+
 import playn.core.PlayN;
 import playn.core.ResourceCallback;
-
-import pythagoras.i.Point;
 
 import flashbang.Flashbang;
 import flashbang.FlashbangApp;
 import flashbang.rsrc.ImageResource;
+import flashbang.rsrc.JsonResource;
 import flashbang.rsrc.ResourceBatch;
 import flashbang.util.Loadable;
 
@@ -33,6 +34,7 @@ public class PapercutApp extends FlashbangApp
                 for (String png : pngs) {
                     images.add(new ImageResource(png));
                 }
+                images.add(new JsonResource("streetwalker/streetwalker.json"));
                 images.load(new Loadable.Callback () {
                     @Override public void done () {
                         Flashbang.app().defaultViewport().unwindToMode(new AnimateMode(pngs));
