@@ -63,7 +63,7 @@ public class AnimateMode extends AppMode
         for (String image : _images) {
             listingRoot.add(new Button().setText(image));
         }
-        _selector = new Selector().add(listingRoot).setSelected(listingRoot.childAt(0));
+        _selector = new Selector(listingRoot, listingRoot.childAt(0));
 
         UnitSlot playSlot = new UnitSlot() {
             @Override public void onEmit () {
@@ -137,7 +137,7 @@ public class AnimateMode extends AppMode
     }
 
     protected String imageName () {
-        return ((Button)_selector.selected()).text();
+        return ((Button)_selector.selected.get()).text();
     }
 
     protected void play () {

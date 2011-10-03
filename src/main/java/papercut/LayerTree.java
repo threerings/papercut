@@ -71,12 +71,12 @@ public class LayerTree extends Elements<LayerTree>
 
     public EditableAnimConf anim () { return layer().animation(_movie.animation.get()); }
 
-    protected Cell selected() { return (Cell)_selector.selected(); }
+    protected Cell selected() { return (Cell)_selector.selected.get(); }
 
     protected void rebuild () {
         removeAll();
         _selector = new Selector();
-        _selector.selectedChanged().connect(new UnitSlot () {
+        _selector.selected.connect(new UnitSlot () {
             @Override public void onEmit () {
                 frameSelected.emit();
             }
@@ -97,7 +97,7 @@ public class LayerTree extends Elements<LayerTree>
                     add(new Cell(movieLayer, childCount()));
                 }
                 if (childCount() > 0 && selected() == null) {
-                    _selector.setSelected(childAt(0));
+                    _selector.selected.update(childAt(0));
                 }
                 return ld;
             }

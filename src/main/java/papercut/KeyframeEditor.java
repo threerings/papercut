@@ -31,7 +31,7 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
             Slider slider = createSlider(kt);
             _sliders.put(kt, slider);
             add(new Label(kt.displayName), slider);
-            slider.valueChanged().connect(new Slot<Float> () {
+            slider.value.connect(new Slot<Float> () {
                 @Override public void onEmit (Float val) {
                     if (_anim == null || _updating) return;
                     _anim.add(kt, _frame, val);
@@ -64,7 +64,7 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
         _updating = true;
         for (Map.Entry<KeyframeType, Slider> entry : _sliders.entrySet()) {
             float value = _anim.keyframes.get(entry.getKey()).find(_frame).interp(_frame);
-            entry.getValue().setValue(value);
+            entry.getValue().value.update(value);
         }
         _updating = false;
     }
