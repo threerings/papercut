@@ -82,10 +82,17 @@ public class AnimateMode extends AppMode
                 play();
             }
         });
+
+        Button save = new Button("Save");
+        save.clicked().connect(new UnitSlot() {
+            @Override public void onEmit () {
+                Papercut.write("streetwalker/streetwalker.json", _movieConf.write());
+            }
+        });
         _iface.createRoot(AxisLayout.vertical(), ROOT, modeLayer).
             setStyles(make(VALIGN.top)).
             setBounds(LISTING_WIDTH + STAGE_WIDTH, 0, LISTING_WIDTH, LISTING_HEIGHT).
-            add(_editor, playToggle);
+            add(_editor, playToggle, save);
 
         _iface.createRoot(AxisLayout.vertical(), ROOT, modeLayer).
             setStyles(make(VALIGN.top)).setBounds(0, LISTING_HEIGHT, SCREEN_SIZE.x(), TREE_HEIGHT).

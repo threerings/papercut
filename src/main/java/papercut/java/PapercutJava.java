@@ -13,7 +13,7 @@ public class PapercutJava
 {
     public static void main (String[] args) {
         JavaPlatform.register().assetManager().setPathPrefix("src/main/resources");
-        Papercut.init(new JavaAssetLister());
+        Papercut.init(new JavaAssetLister(), new JavaAssetWriter());
         PlayN.run(new PapercutApp());
     }
 }
