@@ -116,6 +116,7 @@ public class AnimateMode extends AppMode
         _movie = _movieConf.build();
         _movie.setStopped(!_playing.get());
         _movie.setFrame(_layerTree.frame());
+        _movie.setLoc(STAGE_WIDTH/2, STAGE_HEIGHT/2);
         addObject(_movie, modeLayer);
     }
 
@@ -136,4 +137,5 @@ public class AnimateMode extends AppMode
     protected static final int EDITOR_WIDTH = 200, EDITOR_HEIGHT = 400;
     protected static final int TREE_HEIGHT = SCREEN_SIZE.y() - EDITOR_HEIGHT;
     protected static final int STAGE_WIDTH = SCREEN_SIZE.x() - EDITOR_WIDTH;
+    protected static final int STAGE_HEIGHT = SCREEN_SIZE.y() - TREE_HEIGHT;
 }
