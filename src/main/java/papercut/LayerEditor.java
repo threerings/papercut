@@ -3,6 +3,7 @@
 
 package papercut;
 
+import react.Slot;
 import react.UnitSlot;
 
 import tripleplay.ui.AxisLayout;
@@ -16,14 +17,11 @@ import flashbang.anim.rsrc.MovieConf;
 
 public class LayerEditor extends Elements<LayerEditor>
 {
-    public LayerEditor (final EditableMovieConf conf, final LayerTree tree) {
+    public LayerEditor (final EditableMovieConf conf, final LayerTree tree,
+        Slot<Button> addListener) {
         super(AxisLayout.horizontal());
         add(_add, _remove, _indent, _dedent);
-        _add.clicked().connect(new UnitSlot() {
-            @Override public void onEmit () {
-                conf.add(tree.groupLayer(), new EditableMovieGroupLayerConf("Group"));
-            }
-        });
+        _add.clicked().connect(addListener);
         _remove.clicked().connect(new UnitSlot() {
             @Override public void onEmit () {
                 EditableMovieLayerConf toRemove = tree.layer();
