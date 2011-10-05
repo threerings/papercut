@@ -40,14 +40,13 @@ public class LayerCreator
         root.setBounds(xCenter, yBottom - height, WIDTH, height);
         new Selector().add(root).selected.connect(new Slot<Element<?>> () {
             @Override public void onEmit (Element<?> selected) {
-                System.out.println("CLIECED " + selected);
                 if (selected == newGroup) {
                     movie.add(tree.groupLayer(), new EditableMovieGroupLayerConf("Group"));
                 } else if (selected != cancel) {
                     String image = ((Button)selected).text();
                     movie.add(tree.groupLayer(), new EditableMovieImageLayerConf(image));
                 }
-                iface.removeRoot(root);
+                iface.destroyRoot(root);
             }
         });
     }
