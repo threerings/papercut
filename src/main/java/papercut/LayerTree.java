@@ -74,7 +74,7 @@ public class LayerTree extends Elements<LayerTree>
     protected Cell selected() { return (Cell)_selector.selected.get(); }
 
     protected void rebuild () {
-        removeAll();
+        destroyAll();
         _selector = new Selector();
         _selector.selected.connect(new UnitSlot () {
             @Override public void onEmit () {
@@ -91,7 +91,7 @@ public class LayerTree extends Elements<LayerTree>
             @Override protected LayoutData computeLayout (float hintX, float hintY) {
                 LayoutData ld = super.computeLayout(hintX, hintY);
                 while (childCount() * FRAME_WIDTH > hintX) {
-                    removeAt(childCount() - 1);
+                    destroyAt(childCount() - 1);
                 }
                 while ((childCount() + 1) * FRAME_WIDTH < hintX) {
                     add(new Cell(movieLayer, childCount()));
