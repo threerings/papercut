@@ -3,6 +3,9 @@
 
 package papercut;
 
+import playn.core.CanvasLayer;
+import playn.core.PlayN;
+
 import pythagoras.f.Dimension;
 import pythagoras.f.FloatMath;
 import pythagoras.f.IDimension;
@@ -11,13 +14,11 @@ import react.Signal;
 import react.UnitSignal;
 import react.UnitSlot;
 
-import playn.core.CanvasLayer;
-import playn.core.PlayN;
-
 import tripleplay.ui.AxisLayout;
 import tripleplay.ui.Background;
 import tripleplay.ui.Button;
 import tripleplay.ui.Elements;
+import tripleplay.ui.Field;
 import tripleplay.ui.Group;
 import tripleplay.ui.Label;
 import tripleplay.ui.Selector;
@@ -109,11 +110,15 @@ public class LayerTree extends Elements<LayerTree>
         };
         _selector.add(keyframes);
         Background indenter = Background.solid(0xFFFFFFFF, 0, 0, 0, 10 * indent);
-        add(new Label(movieLayer.name(), make(BACKGROUND.is(indenter))), keyframes);
         if (movieLayer instanceof EditableMovieGroupLayerConf) {
+            Field field = new Field(movieLayer.name(), make(BACKGROUND.is(indenter)));
+            field.text.connect(movieLayer.name.slot());
+            add(field, keyframes);
             for (EditableMovieLayerConf child : ((EditableMovieGroupLayerConf)movieLayer).children) {
                 add(child, indent + 1);
             }
+        } else {
+            add(new Label(movieLayer.name(), make(BACKGROUND.is(indenter))), keyframes);
         }
     }
 

@@ -57,6 +57,7 @@ public class AnimateMode extends AppMode
 
         _iface = new Interface(pointerListener());
         PlayN.pointer().setListener(_iface.plistener);
+        PlayN.keyboard().setListener(_iface.klistener);
 
         UnitSlot playSlot = new UnitSlot() {
             @Override public void onEmit () {
@@ -70,7 +71,7 @@ public class AnimateMode extends AppMode
         _playing = Values.toggler(playToggle.clicked(), false);
         _playing.connect(new Slot<Boolean> () {
             @Override public void onEmit (Boolean play) {
-                playToggle.setText(play ? "Stop" : "Play");
+                playToggle.text.update(play ? "Stop" : "Play");
                 if (_movie == null) return;
                 play();
             }

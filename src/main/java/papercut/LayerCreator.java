@@ -43,7 +43,7 @@ public class LayerCreator
                 if (selected == newGroup) {
                     movie.add(tree.groupLayer(), new EditableMovieGroupLayerConf("Group"));
                 } else if (selected != cancel) {
-                    String image = ((Button)selected).text();
+                    String image = ((Button)selected).text.get();
                     movie.add(tree.groupLayer(), new EditableMovieImageLayerConf(image));
                 }
                 iface.destroyRoot(root);
