@@ -3,6 +3,7 @@
 
 package papercut;
 
+import pythagoras.f.Dimension;
 import pythagoras.f.FloatMath;
 import pythagoras.f.IDimension;
 
@@ -38,7 +39,7 @@ public class LayerTree extends Elements<LayerTree>
     public final UnitSignal frameSelected = new UnitSignal();
 
     public LayerTree (EditableMovieConf movie) {
-        super(new TableLayout(COL.alignRight().fixed(), COL.fixed()).gaps(0, 5));
+        super(new TableLayout(COL.fixed().alignLeft(), COL.stretch()).gaps(0, 5));
         setStylesheet(CELL);
 
         _movie = movie;
@@ -88,6 +89,10 @@ public class LayerTree extends Elements<LayerTree>
 
     protected void add (final EditableMovieLayerConf movieLayer, int indent) {
         Group keyframes = new Group(AxisLayout.horizontal().gap(0)) {
+            @Override protected IDimension preferredSize (float hintX, float hintY) {
+                return new Dimension(FRAME_WIDTH, FRAME_HEIGHT);
+            }
+
             @Override protected LayoutData computeLayout (float hintX, float hintY) {
                 LayoutData ld = super.computeLayout(hintX, hintY);
                 while (childCount() * FRAME_WIDTH > hintX) {
@@ -103,7 +108,7 @@ public class LayerTree extends Elements<LayerTree>
             }
         };
         _selector.add(keyframes);
-        Background indenter = Background.solid(0xFFFFFFFF, 0, 5 * indent, 0, 0);
+        Background indenter = Background.solid(0xFFFFFFFF, 0, 0, 0, 10 * indent);
         add(new Label(movieLayer.name(), make(BACKGROUND.is(indenter))), keyframes);
         if (movieLayer instanceof EditableMovieGroupLayerConf) {
             for (EditableMovieLayerConf child : ((EditableMovieGroupLayerConf)movieLayer).children) {

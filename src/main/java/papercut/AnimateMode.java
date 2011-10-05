@@ -93,7 +93,7 @@ public class AnimateMode extends AppMode
                 new LayerCreator(_iface, modeLayer, _images, _movieConf, _layerTree, button.x, button.y);
             }
         };
-        _iface.createRoot(AxisLayout.vertical(), ROOT, modeLayer).
+        _iface.createRoot(AxisLayout.vertical().offPolicy(AxisLayout.Policy.STRETCH), ROOT, modeLayer).
             setStyles(make(VALIGN.top)).setBounds(0, EDITOR_HEIGHT, SCREEN_SIZE.x(), TREE_HEIGHT).
             add(_layerTree, new LayerEditor(_movieConf, _layerTree, onAdd));
         _layerTree.frameSelected.connect(new UnitSlot () {
