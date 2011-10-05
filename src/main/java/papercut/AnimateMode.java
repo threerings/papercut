@@ -135,7 +135,7 @@ public class AnimateMode extends AppMode
     protected final KeyframeEditor _editor = new KeyframeEditor();
     protected final Iterable<String> _images;
 
-    protected static final int EDITOR_WIDTH = 200, EDITOR_HEIGHT = 400;
+    protected static final int EDITOR_WIDTH = 300, EDITOR_HEIGHT = 400;
     protected static final int TREE_HEIGHT = SCREEN_SIZE.y() - EDITOR_HEIGHT;
     protected static final int STAGE_WIDTH = SCREEN_SIZE.x() - EDITOR_WIDTH;
     protected static final int STAGE_HEIGHT = SCREEN_SIZE.y() - TREE_HEIGHT;
