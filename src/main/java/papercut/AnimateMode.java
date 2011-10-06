@@ -48,7 +48,7 @@ public class AnimateMode extends AppMode
     public AnimateMode (Iterable<String> images) {
         _images = images;
         Json.Object root = JsonResource.require("streetwalker/streetwalker.json").json();
-        _movieConf = new EditableMovieConf(root.getArray("movies", Json.Object.class).get(0));
+        _movieConf = new EditableMovieConf(root.getArray("children", Json.Object.class));
         _layerTree = new LayerTree(_movieConf);
     }
 

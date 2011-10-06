@@ -71,6 +71,8 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
         switch (kt) {
             case X_LOCATION:
             case Y_LOCATION:
+            case X_ORIGIN:
+            case Y_ORIGIN:
                 return new Slider(0, -500, 500);
             case X_SCALE:
             case Y_SCALE:

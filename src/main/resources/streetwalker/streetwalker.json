@@ -1,9 +1,5 @@
 {
-  "movies" : [
-  {
-    "name" : "streetwalker_nw",
-    "children" : [
-    {
+    "children": [ {
       "type" : "Group",
       "name" : "Group",
       "animations" : {
@@ -47,7 +43,5 @@
         }
       }
     }
-    ]
-  }
   ]
 }
