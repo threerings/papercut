@@ -55,6 +55,11 @@ public class LayerTree extends Elements<LayerTree>
 
     public int frame () { return selected() == null ? 0 : selected().frame; }
 
+    public void setFrame (int frame) {
+        _selector.selected.update(_selector.selected.get().parent().childAt(frame));
+
+    }
+
     /**
      * Returns currently selected layer if it's a group layer, the parent of the selected layer if
      * it isn't, or the root layer if there isn't a selected layer.

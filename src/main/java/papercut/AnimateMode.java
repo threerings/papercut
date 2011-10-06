@@ -19,6 +19,7 @@ import tripleplay.ui.AxisLayout;
 import tripleplay.ui.Background;
 import tripleplay.ui.Button;
 import tripleplay.ui.Element;
+import tripleplay.ui.Field;
 import tripleplay.ui.Interface;
 import tripleplay.ui.Root;
 import tripleplay.ui.Stylesheet;
@@ -83,10 +84,26 @@ public class AnimateMode extends AppMode
                 Papercut.write("streetwalker/streetwalker.json", _movieConf.write());
             }
         });
+
+        final Field frame = new Field("0");
+        _layerTree.frameSelected.connect(new UnitSlot() {
+            @Override public void onEmit () {
+                frame.text.update("" + _layerTree.frame());
+            }
+        });
+        frame.defocused.connect(new UnitSlot() {
+            @Override public void onEmit () {
+                try {
+                    _layerTree.setFrame(Integer.parseInt(frame.text.get()));
+                } catch (NumberFormatException e) {}
+            }
+        });
+
+
         _iface.createRoot(AxisLayout.vertical(), ROOT, modeLayer).
             setStyles(make(VALIGN.top)).
             setBounds(STAGE_WIDTH, 0, EDITOR_WIDTH, EDITOR_HEIGHT).
-            add(_editor, playToggle, save);
+            add(_editor, playToggle, save, frame);
 
         Slot<Button> onAdd = new Slot<Button> () {
             @Override public void onEmit (Button clicked) {
