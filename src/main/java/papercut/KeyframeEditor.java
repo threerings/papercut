@@ -45,7 +45,7 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
             final Field entry = new Field();
             UnitSlot entryFromSlider = new UnitSlot () {
                 @Override public void onEmit () {
-                    if (entry.focused()) return;// Don't reformat if the user is changing the text
+                    if (entry.isFocused()) return;// Don't reformat if the user is changing the text
                     entry.text.update(MathUtil.toString(slider.value.get(), 1));
                 }
             };
@@ -71,7 +71,7 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
             // Update the slider with valid field values while editing
             entry.text.connect(new Slot<String> () {
                 @Override public void onEmit (String value) {
-                    if (!entry.focused()) return;
+                    if (!entry.isFocused()) return;
                     try {
                         slider.value.update(Float.parseFloat(value));
                     } catch (NumberFormatException nfe) {}
