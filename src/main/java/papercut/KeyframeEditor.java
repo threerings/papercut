@@ -4,7 +4,10 @@
 package papercut;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
+
+import com.google.common.collect.Lists;
 
 import pythagoras.f.MathUtil;
 
@@ -12,13 +15,18 @@ import react.Slot;
 import react.UnitSignal;
 import react.UnitSlot;
 
+import tripleplay.ui.Button;
+import tripleplay.ui.Element;
 import tripleplay.ui.Elements;
 import tripleplay.ui.Field;
+import tripleplay.ui.Interface;
 import tripleplay.ui.Label;
 import tripleplay.ui.Slider;
 import tripleplay.ui.TableLayout;
 
 import flashbang.anim.rsrc.EditableAnimConf;
+import flashbang.anim.rsrc.EditableKeyframeConf;
+import flashbang.anim.rsrc.InterpolatorType;
 import flashbang.anim.rsrc.KeyframeType;
 
 import static tripleplay.ui.TableLayout.COL;
@@ -27,13 +35,14 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
 {
     public final UnitSignal edited = new UnitSignal();
 
-    public KeyframeEditor () {
-        super(new TableLayout(COL.fixed().alignRight(), COL, COL.fixed().alignLeft()).gaps(0, 2));
+    public KeyframeEditor (final Interface iface) {
+        super(new TableLayout(COL.fixed().alignRight(), COL, COL.fixed().alignLeft(),
+                COL.fixed().alignLeft()).gaps(0, 2));
         for (final KeyframeType kt : KeyframeType.values()) {
             final Slider slider = createSlider(kt);
             _sliders.put(kt, slider);
-            final Field entry = new Field();
 
+            final Field entry = new Field();
             UnitSlot entryFromSlider = new UnitSlot () {
                 @Override public void onEmit () {
                     if (entry.focused()) return;// Don't reformat if the user is changing the text
@@ -41,13 +50,26 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
                 }
             };
             entryFromSlider.onEmit();// Fill in the field with the current slider value
+
+            final List<String> interpNames = Lists.newArrayList();
+            for (InterpolatorType type : InterpolatorType.values()) {
+                interpNames.add(type.name());
+            }
+            final Button interp = new Button();
+            interp.clicked().connect(new UnitSlot() {
+                @Override public void onEmit () {
+                    AnimateMode.popup(iface, interp.layer, interpNames, interp.text.slot());
+                }
+            });
+            _interps.put(kt, interp);
+
+            add(new Label(kt.displayName), slider, entry, interp);
+
             slider.value.connect(entryFromSlider);// Update the text on slider changes
             entry.defocused.connect(entryFromSlider);// Reformat after finishing with text
 
-            add(new Label(kt.displayName), slider, entry);
-
-             // Update the slider with valid field values while editing
-             entry.text.connect(new Slot<String> () {
+            // Update the slider with valid field values while editing
+            entry.text.connect(new Slot<String> () {
                 @Override public void onEmit (String value) {
                     if (!entry.focused()) return;
                     try {
@@ -56,14 +78,18 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
                 }
             });
 
-            // Update the animation whenever the slider changes
-            slider.value.connect(new Slot<Float> () {
-                @Override public void onEmit (Float val) {
+            UnitSlot updateFrame = new UnitSlot () {
+                @Override public void onEmit () {
                     if (_anim == null || _updating) return;
-                    _anim.add(kt, _frame, val);
+                    String t = interp.text.get();
+                    _anim.add(kt, _frame, slider.value.get(),
+                        InterpolatorType.valueOf(t));
                     edited.emit();
                 }
-            });
+            };
+            // Update the animation whenever the slider changes
+            slider.value.connect(updateFrame);
+            interp.text.connect(updateFrame);
         }
     }
 
@@ -90,9 +116,10 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
         _frame = frame;
         _anim = anim;
         _updating = true;
-        for (Map.Entry<KeyframeType, Slider> entry : _sliders.entrySet()) {
-            float value = _anim.keyframes.get(entry.getKey()).find(_frame).interp(_frame);
-            entry.getValue().value.update(value);
+        for (KeyframeType kt : KeyframeType.values()) {
+            EditableKeyframeConf kf = _anim.keyframes.get(kt).find(_frame);
+            _sliders.get(kt).value.update(kf.interp(_frame));
+            _interps.get(kt).text.update(kf.interpolator.get().name());
         }
         _updating = false;
     }
@@ -101,6 +128,8 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
     protected EditableAnimConf _anim;
     protected boolean _updating;
 
+    protected final Map<KeyframeType, Button> _interps =
+        new EnumMap<KeyframeType, Button>(KeyframeType.class);
     protected final Map<KeyframeType, Slider> _sliders =
         new EnumMap<KeyframeType, Slider>(KeyframeType.class);
 }

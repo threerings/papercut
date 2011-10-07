@@ -3,7 +3,12 @@
 
 package papercut;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import playn.core.Font;
+import playn.core.GroupLayer;
 import playn.core.Json;
 import playn.core.Layer;
 import playn.core.PlayN;
@@ -22,11 +27,14 @@ import tripleplay.ui.Element;
 import tripleplay.ui.Field;
 import tripleplay.ui.Interface;
 import tripleplay.ui.Root;
+import tripleplay.ui.Selector;
 import tripleplay.ui.Stylesheet;
 
 import flashbang.AppMode;
 import flashbang.anim.Movie;
 import flashbang.anim.rsrc.EditableMovieConf;
+import flashbang.anim.rsrc.EditableMovieGroupLayerConf;
+import flashbang.anim.rsrc.EditableMovieImageLayerConf;
 import flashbang.rsrc.JsonResource;
 
 import static papercut.PapercutApp.SCREEN_SIZE;
@@ -45,6 +53,24 @@ public class AnimateMode extends AppMode
                 make(BACKGROUND.is(Background.solid(0xFFFFFFFF, 2))).
                 addSelected(COLOR.is(0xFFFFFFFF), BACKGROUND.is(Background.solid(0xFF000000, 2)))).
         create();
+
+    public static Root popup (final Interface iface, GroupLayer parent, Iterable<String> choices,
+            final Slot<String> onSelected) {
+        final Root root = iface.createRoot(AxisLayout.vertical().gap(0), ROOT, parent);
+        for (String choice : choices) {
+            root.add(new Button(choice));
+        }
+        root.add(new Button("Cancel"));
+        root.pack();
+        new Selector().add(root).selected.connect(new Slot<Element<?>> () {
+            @Override public void onEmit (Element<?> emitted) {
+                String selected = ((Button)emitted).text.get();
+                if (!selected.equals("Cancel")) onSelected.onEmit(selected);
+                iface.destroyRoot(root);
+            }
+        });
+        return root;
+    }
 
     public AnimateMode (Iterable<String> images) {
         _images = images;
@@ -65,6 +91,7 @@ public class AnimateMode extends AppMode
                 play();
             }
         };
+        _editor = new KeyframeEditor(_iface);
         _editor.edited.connect(playSlot);
         _movieConf.treeChanged.connect(playSlot);
 
@@ -107,8 +134,22 @@ public class AnimateMode extends AppMode
 
         Slot<Button> onAdd = new Slot<Button> () {
             @Override public void onEmit (Button clicked) {
-                Point button = Layer.Util.layerToScreen(clicked.layer, 0, 0);
-                new LayerCreator(_iface, modeLayer, _images, _movieConf, _layerTree, button.x, button.y);
+                List<String> choices = Lists.newArrayList(_images);
+                choices.add("New Group");
+                Root pop = popup(_iface, clicked.layer, choices, new Slot<String> () {
+                    @Override public void onEmit (String selected) {
+                        if (selected.equals("New Group")) {
+                            _movieConf.add(_layerTree.groupLayer(),
+                                new EditableMovieGroupLayerConf("Group"));
+                        } else {
+                            _movieConf.add(_layerTree.groupLayer(),
+                                new EditableMovieImageLayerConf(selected));
+                        }
+                    }
+                });
+                // Translate our list to the top; it's too long to fit
+                Point screen0 = Layer.Util.layerToScreen(pop.layer, 0, 0);
+                pop.layer.setTranslation(pop.layer.transform().tx(), -screen0.y());
             }
         };
         _iface.createRoot(AxisLayout.vertical().offPolicy(AxisLayout.Policy.STRETCH), ROOT, modeLayer).
@@ -149,7 +190,7 @@ public class AnimateMode extends AppMode
 
     protected final EditableMovieConf _movieConf;
     protected final LayerTree _layerTree;
-    protected final KeyframeEditor _editor = new KeyframeEditor();
+    protected KeyframeEditor _editor;
     protected final Iterable<String> _images;
 
     protected static final int EDITOR_WIDTH = 300, EDITOR_HEIGHT = 400;
