@@ -36,8 +36,8 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
     public final UnitSignal edited = new UnitSignal();
 
     public KeyframeEditor (final Interface iface) {
-        super(new TableLayout(COL.fixed().alignRight(), COL, COL.fixed().alignLeft(),
-                COL.fixed().alignLeft()).gaps(0, 2));
+        super(new TableLayout(COL.fixed().alignRight(), COL, COL.fixed().stretch().alignRight(),
+                COL.fixed().alignLeft()).gaps(2, 2));
         for (final KeyframeType kt : KeyframeType.values()) {
             final Slider slider = createSlider(kt);
             _sliders.put(kt, slider);
@@ -46,7 +46,24 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
             UnitSlot entryFromSlider = new UnitSlot () {
                 @Override public void onEmit () {
                     if (entry.isFocused()) return;// Don't reformat if the user is changing the text
-                    entry.text.update(MathUtil.toString(slider.value.get(), 1));
+                    float value = slider.value.get();
+                    StringBuilder buf = new StringBuilder();
+                    if (value >= 0) buf.append("+");
+                    else {
+                        buf.append("-");
+                        value = -value;
+                    }
+                    int ivalue = (int)value;
+                    if (ivalue < 100) buf.append('0');
+                    if (ivalue < 10) buf.append('0');
+                    buf.append(ivalue);
+                    buf.append(".");
+                    for (int ii = 0; ii < 3; ii++) {
+                        value = (value - ivalue) * 10;
+                        ivalue = (int)value;
+                        buf.append(ivalue);
+                    }
+                    entry.text.update(buf.toString());
                 }
             };
             entryFromSlider.onEmit();// Fill in the field with the current slider value
