@@ -1,47 +1,205 @@
 {
-    "children": [ {
-      "type" : "Group",
-      "name" : "Group",
-      "animations" : {
-        "default" : {
-          "name" : "default",
-          "keyframes" : {
-            "X_LOCATION" : [
-            { "frame" : 15, "value" : 50 }
-            ]
-          }
-        }
-      } ,
-      "children" : [
-        {
-          "type" : "Image",
-          "name" : "streetwalker/NW_skirt_bottom.png",
-          "animations" : {
-            "default" : {
-              "keyframes" : {
-                "ROTATION" : [
-                { "frame" : 10, "value": 1.5 }
-                ]
-              }
+   "children": [
+    {
+        "animations": {
+            "default": {
+                "keyframes": {
+                    "ROTATION": [
+                    {
+                        "frame": 0,
+                        "interp": "EASE_INOUT",
+                        "value": 0.05999999865889549
+                    },
+                    {
+                        "frame": 36,
+                        "interp": "EASE_INOUT",
+                        "value": 0
+                    },
+                    {
+                        "frame": 72,
+                        "interp": "EASE_INOUT",
+                        "value": 0.061080001294612885
+                    }
+                    ],
+                        "X_LOCATION": [
+                        {
+                            "frame": 0,
+                            "interp": "LINEAR",
+                            "value": 4
+                        }
+                    ],
+                        "Y_LOCATION": [
+                        {
+                            "frame": 0,
+                            "interp": "LINEAR",
+                            "value": -3
+                        }
+                    ]
+                }
             }
-          }
+        },
+        "children": [
+        {
+            "animations": {
+                "default": {
+                    "keyframes": {
+                        "ROTATION": [
+                        {
+                            "frame": 0,
+                            "interp": "EASE_INOUT",
+                            "value": 0.05235987529158592
+                        },
+                        {
+                            "frame": 36,
+                            "interp": "EASE_INOUT",
+                            "value": -0.2617993950843811
+                        },
+                        {
+                            "frame": 72,
+                            "interp": "EASE_INOUT",
+                            "value": 0.05239799991250038
+                        }
+                        ],
+                            "X_LOCATION": [
+                            {
+                                "frame": 0,
+                                "interp": "LINEAR",
+                                "value": -20
+                            }
+                        ],
+                            "X_ORIGIN": [
+                            {
+                                "frame": 0,
+                                "interp": "LINEAR",
+                                "value": 6
+                            }
+                        ],
+                            "Y_LOCATION": [
+                            {
+                                "frame": 0,
+                                "interp": "LINEAR",
+                                "value": -51
+                            }
+                        ],
+                            "Y_ORIGIN": [
+                            {
+                                "frame": 0,
+                                "interp": "LINEAR",
+                                "value": 1
+                            }
+                        ]
+                    }
+                }
+            },
+            "name": "streetwalker/SW_arm.png",
+            "type": "Image"
+        },
+        {
+            "animations": {
+                "default": {
+                    "keyframes": {
+                        "X_LOCATION": [
+                        {
+                            "frame": 0,
+                            "interp": "LINEAR",
+                            "value": -32
+                        }
+                        ],
+                            "Y_LOCATION": [
+                            {
+                                "frame": 0,
+                                "interp": "LINEAR",
+                                "value": -73
+                            }
+                        ]
+                    }
+                }
+            },
+            "name": "streetwalker/SW_body.png",
+            "type": "Image"
+        },
+        {
+            "animations": {
+                "default": {
+                    "keyframes": {
+                        "ROTATION": [
+                        {
+                            "frame": 0,
+                            "interp": "EASE_INOUT",
+                            "value": 0.05235987529158592
+                        },
+                        {
+                            "frame": 36,
+                            "interp": "EASE_INOUT",
+                            "value": -0.26179900765419006
+                        },
+                        {
+                            "frame": 72,
+                            "interp": "EASE_INOUT",
+                            "value": 0.05235987529158592
+                        }
+                        ],
+                            "X_LOCATION": [
+                            {
+                                "frame": 0,
+                                "interp": "LINEAR",
+                                "value": -13
+                            }
+                        ],
+                            "X_ORIGIN": [
+                            {
+                                "frame": 0,
+                                "interp": "LINEAR",
+                                "value": 6
+                            }
+                        ],
+                            "Y_LOCATION": [
+                            {
+                                "frame": 0,
+                                "interp": "LINEAR",
+                                "value": -51
+                            }
+                        ],
+                            "Y_ORIGIN": [
+                            {
+                                "frame": 0,
+                                "interp": "LINEAR",
+                                "value": 1
+                            }
+                        ]
+                    }
+                }
+            },
+            "name": "streetwalker/SW_arm.png",
+            "type": "Image"
         }
-      ]
+        ],
+            "name": "body",
+            "type": "Group"
     },
     {
-      "type" : "Image",
-      "name" : "streetwalker/NW_body.png",
-      "animations" : {
-        "default" :{
-          "type" : "Anim",
-          "name" : "default",
-          "keyframes" : {
-            "ALPHA" : [
-            {"type" : "Keyframe", "frame" : 30, "value" : 0}
-            ]
-          }
-        }
-      }
+        "animations": {
+            "default": {
+                "keyframes": {
+                    "X_LOCATION": [
+                    {
+                        "frame": 0,
+                        "interp": "LINEAR",
+                        "value": -12
+                    }
+                    ],
+                        "Y_LOCATION": [
+                        {
+                            "frame": 0,
+                            "interp": "LINEAR",
+                            "value": -5
+                        }
+                    ]
+                }
+            }
+        },
+        "name": "streetwalker/SW_skirt_bottom.png",
+        "type": "Image"
     }
-  ]
+    ]
 }
