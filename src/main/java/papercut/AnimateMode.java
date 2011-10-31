@@ -3,6 +3,8 @@
 
 package papercut;
 
+import playn.core.SurfaceLayer;
+import playn.core.Graphics;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -177,6 +179,10 @@ public class AnimateMode extends AppMode
         _movie.setFrame(_layerTree.frame());
         _movie.setLoc(STAGE_WIDTH/2, STAGE_HEIGHT/2);
         addObject(_movie, modeLayer);
+        SurfaceLayer surface = PlayN.graphics().createSurfaceLayer(10, 10);
+        surface.surface().setFillColor(0xFF000000).drawLine(0, 5, 10, 5, 1).drawLine(5, 0, 5, 10, 1);
+        surface.setTranslation(STAGE_WIDTH/2 - 5, STAGE_HEIGHT/2 - 5);
+        modeLayer.add(surface);
     }
 
     @Override public void update (float dt) {
