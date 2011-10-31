@@ -51,9 +51,7 @@ public class PapercutApp extends FlashbangApp
         });
     }
 
-    @Override public Point screenSize () {
-        return SCREEN_SIZE;
-    }
+    @Override public Point viewSize () { return SCREEN_SIZE; }
 
     protected static final Point SCREEN_SIZE = new Point(1024, 768);
 }
