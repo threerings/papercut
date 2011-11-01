@@ -84,16 +84,14 @@ public class AnimateMode extends AppMode
     @Override protected void setup () {
         super.setup();
 
-        _iface = new Interface(pointerListener());
-        PlayN.pointer().setListener(_iface.plistener);
-        PlayN.keyboard().setListener(_iface.klistener);
+        PlayN.keyboard().setListener(iface.klistener);
 
         UnitSlot playSlot = new UnitSlot() {
             @Override public void onEmit () {
                 play();
             }
         };
-        _editor = new KeyframeEditor(_iface);
+        _editor = new KeyframeEditor(iface);
         _editor.edited.connect(playSlot);
         _movieConf.treeChanged.connect(playSlot);
 
@@ -129,7 +127,7 @@ public class AnimateMode extends AppMode
         });
 
 
-        _iface.createRoot(AxisLayout.vertical(), ROOT, modeLayer).
+        iface.createRoot(AxisLayout.vertical(), ROOT, modeLayer).
             setStyles(make(VALIGN.top)).
             setBounds(STAGE_WIDTH, 0, EDITOR_WIDTH, EDITOR_HEIGHT).
             add(_editor, playToggle, save, frame);
@@ -138,7 +136,7 @@ public class AnimateMode extends AppMode
             @Override public void onEmit (Button clicked) {
                 List<String> choices = Lists.newArrayList(_images);
                 choices.add("New Group");
-                Root pop = popup(_iface, clicked.layer, choices, new Slot<String> () {
+                Root pop = popup(iface, clicked.layer, choices, new Slot<String> () {
                     @Override public void onEmit (String selected) {
                         if (selected.equals("New Group")) {
                             _movieConf.add(_layerTree.groupLayer(),
@@ -154,7 +152,7 @@ public class AnimateMode extends AppMode
                 pop.layer.setTranslation(pop.layer.transform().tx(), -screen0.y());
             }
         };
-        _iface.createRoot(AxisLayout.vertical().offPolicy(AxisLayout.Policy.STRETCH), ROOT, modeLayer).
+        iface.createRoot(AxisLayout.vertical().offPolicy(AxisLayout.Policy.STRETCH), ROOT, modeLayer).
             setStyles(make(VALIGN.top)).setBounds(0, EDITOR_HEIGHT, SCREEN_SIZE.x(), TREE_HEIGHT).
             add(_layerTree, new LayerEditor(_movieConf, _layerTree, onAdd));
         _layerTree.frameSelected.connect(new UnitSlot () {
@@ -185,13 +183,7 @@ public class AnimateMode extends AppMode
         modeLayer.add(surface);
     }
 
-    @Override public void update (float dt) {
-        super.update(dt);
-        _iface.paint(0);
-    }
-
     protected Movie _movie;
-    protected Interface _iface;
     protected ValueView<Boolean> _playing;
 
     protected final EditableMovieConf _movieConf;
