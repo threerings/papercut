@@ -41,7 +41,6 @@ public class LayerTree extends Elements<LayerTree>
 
     public LayerTree (EditableMovieConf movie) {
         super(new TableLayout(COL.fixed().alignLeft(), COL.stretch()).gaps(0, 5));
-        setStylesheet(CELL);
 
         _movie = movie;
 
@@ -76,7 +75,7 @@ public class LayerTree extends Elements<LayerTree>
 
     public EditableMovieLayerConf layer () { return selected() == null ? null : selected().layer; }
 
-    public EditableAnimConf anim () { return layer().animation(_movie.animation.get()); }
+    public EditableAnimConf anim () { return selected().anim(); }
 
     protected Cell selected() { return (Cell)_selector.selected.get(); }
 
@@ -131,39 +130,47 @@ public class LayerTree extends Elements<LayerTree>
 
     protected final EditableMovieConf _movie;
 
-    protected static class Cell extends Button {
+    protected class Cell extends Button {
         public final int frame;
         public final EditableMovieLayerConf layer;
 
         public Cell (EditableMovieLayerConf layer, int frame) {
             this.layer = layer;
             this.frame = frame;
+            Background defaultBackground = new LinedBackground();
+            if (anim().hasKeyframe(frame)) {
+                defaultBackground = new LinedBackground(0xFF00FF00);
+            }
+            setStyles(make(BACKGROUND.is(defaultBackground)).
+                addSelected(BACKGROUND.is(new LinedBackground(0xFFFF0000))));
         }
+
+        public EditableAnimConf anim () { return layer.animation(_movie.animation.get()); }
     }
 
     protected static class LinedBackground extends Background {
         public LinedBackground () {
+            this(0xFFFFFFFF);
+        }
+
+        public LinedBackground (int fill) {
             super(FRAME_HEIGHT, FRAME_WIDTH, 0, 0);
+            _fill = fill;
         }
 
         @Override protected Instance instantiate (IDimension size) {
             int cwidth = FloatMath.iceil(size.width()), cheight = FloatMath.iceil(size.height());
             CanvasLayer canvas = PlayN.graphics().createCanvasLayer(cwidth, cheight);
-            canvas.canvas().setFillColor(0xFFFFFFFF);
+            canvas.canvas().setFillColor(_fill);
             canvas.canvas().fillRect(0, 0, size.width(), size.height());
             canvas.canvas().setStrokeColor(0xFF000000);
             canvas.canvas().strokeRect(0, 0, size.width() - 1, size.height() - 1);
             return new LayerInstance(canvas);
         }
+
+        protected final int _fill;
     }
 
     protected static final int FRAME_HEIGHT = 14;
     protected static final int FRAME_WIDTH = 8;
-
-    protected static final Stylesheet CELL = Stylesheet.builder().add(Cell.class,
-        make(BACKGROUND.is(new LinedBackground())).
-        addSelected(BACKGROUND.is(Background.solid(0xFFFF0000, FRAME_HEIGHT, FRAME_WIDTH, 0, 0)))).
-        create();
-
-
 }
