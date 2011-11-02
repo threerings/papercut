@@ -153,7 +153,8 @@ public class AnimateMode extends AppMode
             }
         };
         iface.createRoot(AxisLayout.vertical().offPolicy(AxisLayout.Policy.STRETCH), ROOT, modeLayer).
-            setStyles(make(VALIGN.top)).setBounds(0, EDITOR_HEIGHT, SCREEN_SIZE.x(), TREE_HEIGHT).
+            setStyles(make(VALIGN.top)).
+            setBounds(5, EDITOR_HEIGHT, SCREEN_SIZE.x() - 10, TREE_HEIGHT).
             add(_layerTree, new LayerEditor(_movieConf, _layerTree, onAdd));
         _layerTree.frameSelected.connect(new UnitSlot () {
             @Override public void onEmit () {
