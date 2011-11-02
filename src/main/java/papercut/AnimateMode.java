@@ -3,6 +3,7 @@
 
 package papercut;
 
+import playn.core.Pointer;
 import playn.core.SurfaceLayer;
 import playn.core.Graphics;
 import java.util.List;
@@ -59,6 +60,12 @@ public class AnimateMode extends AppMode
     public static Root popup (final Interface iface, GroupLayer parent, Iterable<String> choices,
             final Slot<String> onSelected) {
         final Root root = iface.createRoot(AxisLayout.vertical().gap(0), ROOT, parent);
+        // Dismiss the popup if the user clicks outside of it
+        root.setPointerDelegate(new Root.PointerDelegate() {
+            @Override public boolean handlePointerStart(Pointer.Event event) { return true; }
+            @Override public void onPointerDrag(Pointer.Event event) { /* NOOP! */ }
+            @Override public void onPointerEnd(Pointer.Event event) { iface.destroyRoot(root); }
+        });
         for (String choice : choices) {
             root.add(new Button(choice));
         }
