@@ -3,6 +3,7 @@
 
 package papercut;
 
+import tripleplay.ui.Style;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -42,20 +43,17 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
             final Slider slider = createSlider(kt);
             _sliders.put(kt, slider);
 
-            final Field entry = new Field();
+            final Field entry = new Field().setStyles(Style.HALIGN.right).setMaxText("-000.000");
             UnitSlot entryFromSlider = new UnitSlot () {
                 @Override public void onEmit () {
                     if (entry.isFocused()) return;// Don't reformat if the user is changing the text
                     float value = slider.value.get();
                     StringBuilder buf = new StringBuilder();
-                    if (value >= 0) buf.append("+");
-                    else {
+                    if (value < 0) {
                         buf.append("-");
                         value = -value;
                     }
                     int ivalue = (int)value;
-                    if (ivalue < 100) buf.append('0');
-                    if (ivalue < 10) buf.append('0');
                     buf.append(ivalue);
                     buf.append(".");
                     for (int ii = 0; ii < 3; ii++) {
@@ -72,7 +70,7 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
             for (InterpolatorType type : InterpolatorType.values()) {
                 interpNames.add(type.name());
             }
-            final Button interp = new Button();
+            final Button interp = new Button().setMaxText("EASE_INOUT");
             interp.clicked().connect(new UnitSlot() {
                 @Override public void onEmit () {
                     AnimateMode.popup(iface, interp.layer, interpNames, interp.text.slot());
