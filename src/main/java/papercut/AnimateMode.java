@@ -31,6 +31,7 @@ import tripleplay.ui.Field;
 import tripleplay.ui.Interface;
 import tripleplay.ui.Root;
 import tripleplay.ui.Selector;
+import tripleplay.ui.SimpleStyles;
 import tripleplay.ui.Stylesheet;
 
 import flashbang.AppMode;
@@ -51,11 +52,8 @@ public class AnimateMode extends AppMode
     protected static final Font SMALL =
         PlayN.graphics().createFont("Helvetica", Font.Style.PLAIN, 12);
 
-    public static final Stylesheet ROOT = Stylesheet.builder().
+    public static final Stylesheet ROOT = SimpleStyles.newSheetBuilder().
         add(Element.class, make(FONT.is(SMALL))).
-        add(Button.class,
-                make(BACKGROUND.is(Background.solid(0xFFFFFFFF, 2))).
-                addSelected(COLOR.is(0xFFFFFFFF), BACKGROUND.is(Background.solid(0xFF000000, 2)))).
         create();
 
     public static Root popup (final Interface iface, GroupLayer parent, Iterable<String> choices,
