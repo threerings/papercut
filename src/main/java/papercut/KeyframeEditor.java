@@ -17,6 +17,7 @@ import react.UnitSignal;
 import react.UnitSlot;
 
 import tripleplay.ui.Button;
+import tripleplay.ui.Constraints;
 import tripleplay.ui.Element;
 import tripleplay.ui.Elements;
 import tripleplay.ui.Field;
@@ -37,31 +38,19 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
     public final UnitSignal edited = new UnitSignal();
 
     public KeyframeEditor (final Interface iface) {
-        super(new TableLayout(COL.fixed().alignRight(), COL, COL.fixed().minWidth(50).alignRight(),
+        super(new TableLayout(COL.fixed().alignRight(), COL, COL.fixed().alignRight(),
                               COL.fixed().minWidth(80).alignLeft()).gaps(2, 2));
         for (final KeyframeType kt : KeyframeType.values()) {
             final Slider slider = createSlider(kt);
             _sliders.put(kt, slider);
 
-            final Field entry = new Field().setStyles(Style.HALIGN.right);
+            final Field entry = new Field().setStyles(Style.HALIGN.right).
+                setConstraint(Constraints.fixedSize("-000.00"));
             UnitSlot entryFromSlider = new UnitSlot () {
                 @Override public void onEmit () {
                     if (entry.isFocused()) return;// Don't reformat if the user is changing the text
                     float value = slider.value.get();
-                    StringBuilder buf = new StringBuilder();
-                    if (value < 0) {
-                        buf.append("-");
-                        value = -value;
-                    }
-                    int ivalue = (int)value;
-                    buf.append(ivalue);
-                    buf.append(".");
-                    for (int ii = 0; ii < 3; ii++) {
-                        value = (value - ivalue) * 10;
-                        ivalue = (int)value;
-                        buf.append(ivalue);
-                    }
-                    entry.text.update(buf.toString());
+                    entry.text.update(format(value, 2));
                 }
             };
             entryFromSlider.onEmit();// Fill in the field with the current slider value
@@ -106,6 +95,23 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
             slider.value.connect(updateFrame);
             interp.text.connect(updateFrame);
         }
+    }
+
+    protected static String format (float value, int decimals) {
+        StringBuilder buf = new StringBuilder();
+        if (value < 0) {
+            buf.append("-");
+            value = -value;
+        }
+        int ivalue = (int)value;
+        buf.append(ivalue);
+        buf.append(".");
+        for (int ii = 0; ii < decimals; ii++) {
+            value = (value - ivalue) * 10;
+            ivalue = (int)value;
+            buf.append(ivalue);
+        }
+        return buf.toString();
     }
 
     protected static Slider createSlider (KeyframeType kt) {
