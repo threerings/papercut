@@ -34,6 +34,7 @@ import tripleplay.ui.Selector;
 import tripleplay.ui.Stylesheet;
 
 import flashbang.AppMode;
+import flashbang.Flashbang;
 import flashbang.anim.Movie;
 import flashbang.anim.rsrc.EditableMovieConf;
 import flashbang.anim.rsrc.EditableMovieGroupLayerConf;
@@ -59,7 +60,8 @@ public class AnimateMode extends AppMode
 
     public static Root popup (final Interface iface, GroupLayer parent, Iterable<String> choices,
             final Slot<String> onSelected) {
-        final Root root = iface.createRoot(AxisLayout.vertical().gap(0), ROOT, parent);
+        final Root root = iface.createRoot(AxisLayout.vertical().gap(0), ROOT,
+            Flashbang.mode().modeLayer);
         // Dismiss the popup if the user clicks outside of it
         root.setPointerDelegate(new Root.PointerDelegate() {
             @Override public boolean handlePointerStart(Pointer.Event event) { return true; }
@@ -70,7 +72,8 @@ public class AnimateMode extends AppMode
             root.add(new Button(choice));
         }
         root.add(new Button("Cancel"));
-        root.pack();
+        Point corner = Layer.Util.layerToScreen(parent, 0, 0);
+        root.pack().layer.setTranslation(corner.x, corner.y);
         new Selector().add(root).selected.connect(new Slot<Element<?>> () {
             @Override public void onEmit (Element<?> emitted) {
                 String selected = ((Button)emitted).text.get();
@@ -154,9 +157,6 @@ public class AnimateMode extends AppMode
                         }
                     }
                 });
-                // Translate our list to the top; it's too long to fit
-                Point screen0 = Layer.Util.layerToScreen(pop.layer, 0, 0);
-                pop.layer.setTranslation(pop.layer.transform().tx(), -screen0.y());
             }
         };
         iface.createRoot(AxisLayout.vertical().offPolicy(AxisLayout.Policy.STRETCH), ROOT, modeLayer).
