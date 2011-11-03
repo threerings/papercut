@@ -37,13 +37,13 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
     public final UnitSignal edited = new UnitSignal();
 
     public KeyframeEditor (final Interface iface) {
-        super(new TableLayout(COL.fixed().alignRight(), COL, COL.fixed().stretch().alignRight(),
-                COL.fixed().alignLeft()).gaps(2, 2));
+        super(new TableLayout(COL.fixed().alignRight(), COL, COL.fixed().minWidth(50).alignRight(),
+                              COL.fixed().minWidth(80).alignLeft()).gaps(2, 2));
         for (final KeyframeType kt : KeyframeType.values()) {
             final Slider slider = createSlider(kt);
             _sliders.put(kt, slider);
 
-            final Field entry = new Field().setStyles(Style.HALIGN.right).setMaxText("-000.000");
+            final Field entry = new Field().setStyles(Style.HALIGN.right);
             UnitSlot entryFromSlider = new UnitSlot () {
                 @Override public void onEmit () {
                     if (entry.isFocused()) return;// Don't reformat if the user is changing the text
@@ -70,7 +70,7 @@ public class KeyframeEditor extends Elements<KeyframeEditor>
             for (InterpolatorType type : InterpolatorType.values()) {
                 interpNames.add(type.name());
             }
-            final Button interp = new Button().setMaxText("EASE_INOUT");
+            final Button interp = new Button();
             interp.clicked().connect(new UnitSlot() {
                 @Override public void onEmit () {
                     AnimateMode.popup(iface, interp.layer, interpNames, interp.text.slot());
