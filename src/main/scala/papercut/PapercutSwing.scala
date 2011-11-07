@@ -19,6 +19,8 @@ import react.UnitSlot
 import flashbang.Flashbang
 
 object PapercutSwing extends SimpleSwingApplication {
+  implicit def func0ToSlot (f :() => _) = new UnitSlot() { def onEmit () = f() }
+
   val play = new Button(Action("Play") {
     val mode = Flashbang.app.defaultViewport.topMode.asInstanceOf[AnimateMode]
     mode.playing.update(!mode.playing.get())
@@ -33,17 +35,13 @@ object PapercutSwing extends SimpleSwingApplication {
     Papercut.init(new JavaAssetLister(), new JavaAssetWriter());
     PlayN.run(new PapercutApp());
     // Once AnimateMode is in place, hook the play button's text to the mode's state
-    Flashbang.app.defaultViewport.topModeChanged.connect(new UnitSlot() {
-      def onEmit () {
-        Flashbang.app.defaultViewport.topMode match {
-          case anim :AnimateMode => anim.playing.connect(new UnitSlot() {
-            def onEmit () {
-              play.text = if (anim.playing.get()) "Stop" else "Play"
-            }
-          })
-        }
+    Flashbang.app.defaultViewport.topModeChanged.connect(() =>
+      Flashbang.app.defaultViewport.topMode match {
+        case anim :AnimateMode => anim.playing.connect(() =>
+          play.text = if (anim.playing.get()) "Stop" else "Play"
+        )
       }
-    })
+    )
     super.startup(args)
   }
 }
