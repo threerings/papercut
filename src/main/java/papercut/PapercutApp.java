@@ -6,10 +6,10 @@ package papercut;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
-import pythagoras.i.Point;
-
 import playn.core.PlayN;
 import playn.core.ResourceCallback;
+
+import pythagoras.i.Point;
 
 import flashbang.Flashbang;
 import flashbang.FlashbangApp;
@@ -20,10 +20,14 @@ import flashbang.util.Loadable;
 
 public class PapercutApp extends FlashbangApp
 {
+    public PapercutApp (LocalAssets assets) {
+        _assets = assets;
+    }
+
     @Override public void init () {
         super.init();
 
-        Papercut.listAssets("", new ResourceCallback<Iterable<String>>() {
+        _assets.listAssets("", new ResourceCallback<Iterable<String>>() {
             @Override public void done (Iterable<String> assets) {
                 final Iterable<String> pngs = Iterables.filter(assets, new Predicate<String> () {
                     @Override public boolean apply (String asset) {
@@ -37,7 +41,8 @@ public class PapercutApp extends FlashbangApp
                 images.add(new JsonResource("streetwalker/streetwalker.json"));
                 images.load(new Loadable.Callback () {
                     @Override public void done () {
-                        Flashbang.app().defaultViewport().unwindToMode(new AnimateMode(pngs));
+                        Flashbang.app().defaultViewport().unwindToMode(new AnimateMode(pngs,
+                            _assets));
                     }
 
                     @Override public void error (Throwable t) {
@@ -52,6 +57,8 @@ public class PapercutApp extends FlashbangApp
     }
 
     @Override public Point viewSize () { return SCREEN_SIZE; }
+
+    protected final LocalAssets _assets;
 
     protected static final Point SCREEN_SIZE = new Point(1024, 768);
 }

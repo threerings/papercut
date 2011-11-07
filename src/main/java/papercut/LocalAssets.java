@@ -1,28 +1,38 @@
 //
 // Papercut - Copyright 2011 Three Rings Design, Inc.
 
-package papercut.java;
+package papercut;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 
-import papercut.AssetLister;
-
-import playn.core.PlayN;
 import playn.core.ResourceCallback;
-import playn.java.JavaAssetManager;
 
-public class JavaAssetLister implements AssetLister
+public class LocalAssets
 {
+    public LocalAssets (String pathPrefix) {
+        _pathPrefix = pathPrefix;
+    }
+
+    public void write (String path, String text) {
+        File out = new File(_pathPrefix, path);
+        try {
+            Files.write(text, out, Charsets.UTF_8);
+        } catch (IOException io) {
+            throw new RuntimeException(io);
+        }
+    }
+
     public void listAssets (String directory, ResourceCallback<Iterable<String>> callback) {
-        String root =
-            new File(((JavaAssetManager)PlayN.assetManager()).getPathPrefix()).getAbsolutePath();
+        String root = new File(_pathPrefix).getAbsolutePath();
         List<String> assets = Lists.newArrayList();
         collectAssets(root, new File(root, directory), assets);
         callback.done(assets);
-
     }
 
     protected void collectAssets (String root, File dir, List<String> assets) {
@@ -34,4 +44,6 @@ public class JavaAssetLister implements AssetLister
             }
         }
     }
+
+    protected final String _pathPrefix;
 }

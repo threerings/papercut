@@ -8,9 +8,6 @@ import scala.swing.Button
 import scala.swing.MainFrame
 import scala.swing.SimpleSwingApplication
 
-import papercut.java.JavaAssetLister
-import papercut.java.JavaAssetWriter
-
 import playn.core.PlayN
 import playn.java.JavaPlatform
 
@@ -34,9 +31,9 @@ object PapercutSwing extends SimpleSwingApplication {
   }
 
   override def startup (args :Array[String]) {
-    JavaPlatform.register().assetManager().setPathPrefix("src/main/resources");
-    Papercut.init(new JavaAssetLister(), new JavaAssetWriter());
-    PlayN.run(new PapercutApp());
+    val prefix = "src/main/resources"
+    JavaPlatform.register().assetManager().setPathPrefix(prefix);
+    PlayN.run(new PapercutApp(new LocalAssets(prefix)))
     // Once AnimateMode is in place, hook the play button's text to the mode's state
     Flashbang.app.defaultViewport.topModeChanged.connect((mode :AppMode) => mode match {
       case anim :AnimateMode => anim.playing.connect(() =>

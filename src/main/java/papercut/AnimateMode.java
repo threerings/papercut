@@ -22,7 +22,6 @@ import react.UnitSlot;
 import react.Value;
 
 import tripleplay.ui.AxisLayout;
-import tripleplay.ui.Background;
 import tripleplay.ui.Button;
 import tripleplay.ui.Element;
 import tripleplay.ui.Field;
@@ -82,8 +81,9 @@ public class AnimateMode extends AppMode
 
     public final Value<Boolean> playing = Value.create(false);
 
-    public AnimateMode (Iterable<String> images) {
+    public AnimateMode (Iterable<String> images, LocalAssets assets) {
         _images = images;
+        _assets = assets;
         Json.Object root = JsonResource.require("streetwalker/streetwalker.json").json();
         _movieConf = new EditableMovieConf(root.getArray("children", Json.Object.class));
         _layerTree = new LayerTree(_movieConf);
@@ -120,7 +120,7 @@ public class AnimateMode extends AppMode
         Button save = new Button("Save");
         save.clicked().connect(new UnitSlot() {
             @Override public void onEmit () {
-                Papercut.write("streetwalker/streetwalker.json", _movieConf.write());
+                _assets.write("streetwalker/streetwalker.json", _movieConf.write());
             }
         });
 
@@ -202,6 +202,7 @@ public class AnimateMode extends AppMode
     protected final LayerTree _layerTree;
     protected KeyframeEditor _editor;
     protected final Iterable<String> _images;
+    protected final LocalAssets _assets;
 
     protected static final int EDITOR_WIDTH = 300, EDITOR_HEIGHT = 400;
     protected static final int TREE_HEIGHT = SCREEN_SIZE.y() - EDITOR_HEIGHT;
