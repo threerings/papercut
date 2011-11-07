@@ -11,12 +11,13 @@ object PapercutBuild extends Build {
       organization := "com.threerings",
       version      := "1.0-SNAPSHOT",
       name         := "papercut",
-      crossPaths   := false,
-
+      scalaVersion := "2.9.0-1",
+      scalacOptions ++= Seq("-deprecation"),
       javacOptions ++= Seq("-Xlint", "-Xlint:-serial"),
       fork in Compile := true,
-
-      autoScalaLibrary := false // no scala-library dependency
+      libraryDependencies ++= Seq(
+        "org.scala-lang" % "scala-swing" % "2.9.0-1"
+      )
     )
   ))
 }

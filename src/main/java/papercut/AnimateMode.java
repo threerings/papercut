@@ -3,9 +3,6 @@
 
 package papercut;
 
-import playn.core.Pointer;
-import playn.core.SurfaceLayer;
-import playn.core.Graphics;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -15,13 +12,14 @@ import playn.core.GroupLayer;
 import playn.core.Json;
 import playn.core.Layer;
 import playn.core.PlayN;
+import playn.core.Pointer;
+import playn.core.SurfaceLayer;
 
 import pythagoras.f.Point;
 
 import react.Slot;
 import react.UnitSlot;
-import react.ValueView;
-import react.Values;
+import react.Value;
 
 import tripleplay.ui.AxisLayout;
 import tripleplay.ui.Background;
@@ -82,6 +80,8 @@ public class AnimateMode extends AppMode
         return root;
     }
 
+    public final Value<Boolean> playing = Value.create(false);
+
     public AnimateMode (Iterable<String> images) {
         _images = images;
         Json.Object root = JsonResource.require("streetwalker/streetwalker.json").json();
@@ -94,22 +94,26 @@ public class AnimateMode extends AppMode
 
         PlayN.keyboard().setListener(iface.klistener);
 
-        UnitSlot playSlot = new UnitSlot() {
+        UnitSlot updateSlot = new UnitSlot() {
             @Override public void onEmit () {
-                play();
+                updateMovie();
             }
         };
         _editor = new KeyframeEditor(iface);
-        _editor.edited.connect(playSlot);
-        _movieConf.treeChanged.connect(playSlot);
+        _editor.edited.connect(updateSlot);
+        _movieConf.treeChanged.connect(updateSlot);
 
         final Button playToggle = new Button("Play");
-        _playing = Values.toggler(playToggle.clicked(), false);
-        _playing.connect(new Slot<Boolean> () {
+        playToggle.clicked().connect(new UnitSlot() {
+            @Override public void onEmit () {
+                playing.update(!playing.get());
+            }
+        });
+        playing.connect(new Slot<Boolean> () {
             @Override public void onEmit (Boolean play) {
                 playToggle.text.update(play ? "Stop" : "Play");
                 if (_movie == null) return;
-                play();
+                updateMovie();
             }
         });
 
@@ -168,10 +172,10 @@ public class AnimateMode extends AppMode
                 _movie.setFrame(_layerTree.frame());
             }
         });
-        play();
+        updateMovie();
     }
 
-    protected void play () {
+    protected void updateMovie () {
         if (_movie != null) {
             _movie.destroySelf();
             _movie = null;
@@ -179,7 +183,7 @@ public class AnimateMode extends AppMode
         if (_movieConf.root.children.isEmpty()) return;
 
         _movie = _movieConf.build();
-        _movie.setStopped(!_playing.get());
+        _movie.setStopped(!playing.get());
         _movie.setFrame(_layerTree.frame());
         _movie.setLoc(STAGE_WIDTH/2, STAGE_HEIGHT/2);
         addObject(_movie, modeLayer);
@@ -189,8 +193,10 @@ public class AnimateMode extends AppMode
         modeLayer.add(surface);
     }
 
+    public void stop () {
+    }
+
     protected Movie _movie;
-    protected ValueView<Boolean> _playing;
 
     protected final EditableMovieConf _movieConf;
     protected final LayerTree _layerTree;
