@@ -14,12 +14,15 @@ import papercut.java.JavaAssetWriter
 import playn.core.PlayN
 import playn.java.JavaPlatform
 
+import react.Slot
 import react.UnitSlot
 
+import flashbang.AppMode
 import flashbang.Flashbang
 
 object PapercutSwing extends SimpleSwingApplication {
   implicit def func0ToSlot (f :() => _) = new UnitSlot() { def onEmit () = f() }
+  implicit def func1ToSlot[T] (f :(T) => _) = new Slot[T]() { def onEmit (t :T) = f(t) }
 
   val play = new Button(Action("Play") {
     val mode = Flashbang.app.defaultViewport.topMode.asInstanceOf[AnimateMode]
@@ -35,13 +38,11 @@ object PapercutSwing extends SimpleSwingApplication {
     Papercut.init(new JavaAssetLister(), new JavaAssetWriter());
     PlayN.run(new PapercutApp());
     // Once AnimateMode is in place, hook the play button's text to the mode's state
-    Flashbang.app.defaultViewport.topModeChanged.connect(() =>
-      Flashbang.app.defaultViewport.topMode match {
-        case anim :AnimateMode => anim.playing.connect(() =>
-          play.text = if (anim.playing.get()) "Stop" else "Play"
-        )
-      }
-    )
+    Flashbang.app.defaultViewport.topModeChanged.connect((mode :AppMode) => mode match {
+      case anim :AnimateMode => anim.playing.connect(() =>
+        play.text = if (anim.playing.get) "Stop" else "Play"
+      )
+    })
     super.startup(args)
   }
 }
